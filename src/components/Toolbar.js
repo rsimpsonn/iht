@@ -2,6 +2,9 @@ import React from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import userContext from "../contexts/userContext";
+import { Popup } from "semantic-ui-react";
+import getTutor from "../tutors.js";
+import firebase from "../firebase";
 
 function Toolbar() {
   return (
@@ -20,6 +23,17 @@ function Toolbar() {
             {context.user != null && (
               <Header>
                 <StyledLink to="/dashboard">Dashboard</StyledLink>
+                <button onClick={() => firebase.auth.signOut()}>
+                  Sign Out
+                </button>
+                <Popup
+                  trigger={<Circle />}
+                  position="bottom center"
+                  flowing
+                  hoverable
+                >
+                  <p>Settings</p>
+                </Popup>
               </Header>
             )}
           </Bar>
@@ -58,6 +72,13 @@ const StyledLink = styled(Link)`
   &:active {
     text-decoration: none;
   }
+`;
+
+const Circle = styled.img`
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  background-color: black;
 `;
 
 export default Toolbar;
