@@ -36,6 +36,7 @@ class UpcomingSession extends Component {
     if (context.isTutor) {
       eduLevel = await getEduLevel(w.data().educationID);
     }
+
     this.setState({
       subject: subject,
       w: w.data(),

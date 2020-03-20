@@ -12,9 +12,9 @@ const getTutor = async id => {
 
   const tutRef = firebase.db.collection("tutors").doc(id);
   const tutor = await tutRef.get();
-  loadedTutors[id] = tutor.data();
+  loadedTutors[id] = { id, ...tutor.data() };
 
-  return tutor.data();
+  return { id, ...tutor.data() };
 };
 
 export default getTutor;

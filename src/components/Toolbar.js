@@ -22,7 +22,10 @@ function Toolbar(props) {
             <StyledLink to="/">Ivy Home Tutors</StyledLink>
           </Header>
           {context.user == null && (
-            <ListItem bold onClick={() => props.history.push("/signin")}>SignIn</ListItem>
+            <ListItem bold onClick={() => props.history.push("/signin")}>
+              Sign In
+            </ListItem>
+
           )}
           {context.user != null && (
             <Bar>

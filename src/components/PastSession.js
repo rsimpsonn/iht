@@ -7,22 +7,23 @@ import * as fb from "firebase";
 import userContext from "../contexts/userContext";
 import getSubject from "../subjects";
 
+
 import Cog from "react-icons/lib/fa/cog";
 import Check from "react-icons/lib/fa/check-circle";
 import Times from "react-icons/lib/fa/times-circle";
 import { Popup } from "semantic-ui-react";
 
-class PastSession extends Component{
-    state = {
-      subject: "",
-      w: {
-        firstName: "",
-        lastName: ""
-      }
+class PastSession extends Component {
+  state = {
+    subject: "",
+    w: {
+      firstName: "",
+      lastName: ""
+    }
+  };
 
-    };
 
-    static contextType = userContext;
+  static contextType = userContext;
 
   async componentDidMount() {
     const subject = await getSubject(this.props.session.subjectID);
@@ -68,12 +69,8 @@ class PastSession extends Component{
     ];
     return (
       <Box>
-        <Menu>
-          {this.state.subject.title}
-        </Menu>
-        <p>
-        {this.props.session.status}
-        </p>
+        <Menu>{this.state.subject.title}</Menu>
+        <p>{this.props.session.status}</p>
         <p>
           {days[startDate.getDay()]}, {months[startDate.getMonth()]}{" "}
           {startDate.getDate()}
@@ -107,7 +104,6 @@ class PastSession extends Component{
       </Box>
     );
   }
-
 }
 
 
