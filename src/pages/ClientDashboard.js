@@ -9,6 +9,7 @@ import userContext from "../contexts/userContext";
 
 import UpcomingSessions from "../components/UpcomingSessions";
 import ScheduleSessions from "../components/ScheduleSessions";
+import PastSessions from "../components/PastSessions";
 //import PastSessions from "../components/PastSessions";
 
 class ClientDashboard extends Component {
@@ -35,7 +36,7 @@ class ClientDashboard extends Component {
     firebase.db
       .collection("sessions")
       .where(userType, "==", context.user.uid)
-      .where("end", ">=", new Date())
+
       .onSnapshot(snapshot => {
         snapshot.docChanges().forEach(change => {
           let newSessions = this.state.sessions;
@@ -80,6 +81,9 @@ class ClientDashboard extends Component {
           sessions={this.state.sessions.filter(s => s.status === "Upcoming")}
         />
         <ScheduleSessions client={this.state.client} />
+        <PastSessions
+          sessions={this.state.sessions.filter(s => s.status === "Cancelled fee" || s.status ==="Cancelled no fee" || s.status ==="Completed" || s.status === "No Show")}
+        />
       </div>
     );
   }

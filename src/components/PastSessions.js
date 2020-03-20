@@ -4,15 +4,18 @@ import styled from "styled-components";
 import firebase from "../firebase";
 import userContext from "../contexts/userContext";
 
-import RequestedSession from "./RequestedSession";
+import PastSession from "./PastSession";
 
-function RequestedSessions(props) {
+function PastSessions(props) {
+  if (!props.sessions) {
+    return <div />;
+  }
   return (
     <div>
-      {props.sessions.length > 0 && <Header>Requested Sessions</Header>}
+      {props.sessions.length > 0 && <Header>Past Sessions</Header>}
       <Bar>
         {props.sessions.map(s => (
-          <RequestedSession session={s} />
+          <PastSession session={s} />
         ))}
       </Bar>
     </div>
@@ -31,4 +34,4 @@ const Bar = styled.div`
   flex-direction: row;
 `;
 
-export default RequestedSessions;
+export default PastSessions;

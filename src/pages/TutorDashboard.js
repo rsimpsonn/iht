@@ -7,7 +7,8 @@ import userContext from "../contexts/userContext";
 
 import UpcomingSessions from "../components/UpcomingSessions";
 import RequestedSessions from "../components/RequestedSessions";
-//import PastSessions from "../components/PastSessions";
+import PastSessions from "../components/PastSessions";
+
 
 class TutorDashboard extends Component {
   state = { alert: false, sessions: [] };
@@ -25,7 +26,7 @@ class TutorDashboard extends Component {
     firebase.db
       .collection("sessions")
       .where(userType, "==", context.user.uid)
-      .where("end", ">=", new Date())
+  
       .onSnapshot(snapshot => {
         snapshot.docChanges().forEach(change => {
           let newSessions = this.state.sessions;
@@ -51,6 +52,7 @@ class TutorDashboard extends Component {
   }
 
   render() {
+    console.log(this.state.sessions)
     return (
       <div>
         {this.state.alert && (
@@ -69,6 +71,10 @@ class TutorDashboard extends Component {
         <RequestedSessions
           sessions={this.state.sessions.filter(s => s.status === "Requested")}
         />
+        <PastSessions
+          sessions={this.state.sessions.filter(s => s.status === "Cancelled fee" || s.status ==="Cancelled no fee" || s.status ==="Completed" || s.status ==="No Show")}
+        />
+      
       </div>
     );
   }
