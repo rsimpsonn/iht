@@ -12,9 +12,9 @@ import { AiFillCheckCircle, AiFillCloseCircle } from "react-icons/ai";
 
 class RequestedSession extends Component {
   state = {
-    subject: {},
-    meetingWith: {},
-    level: {}
+    subject: "",
+    meetingWith: "",
+    level: "",
   };
 
   static contextType = userContext;
@@ -30,7 +30,10 @@ class RequestedSession extends Component {
       );
     const meetingWith = await withRef.get();
 
-    const eduLevel = await getEduLevel(meetingWith.data().educationID);
+    let eduLevel = false;
+    if (context.isTutor) {
+      eduLevel = await getEduLevel(meetingWith.data().educationID);
+    }
 
     this.setState({
       subject: subject,
@@ -72,6 +75,7 @@ class RequestedSession extends Component {
       this.respondToRequest(false);
     }
   }
+
 
   render() {
     const startDate = this.props.session.start.toDate();
@@ -146,6 +150,7 @@ class RequestedSession extends Component {
     );
   }
 }
+
 
 const BetterCheck = styled(AiFillCheckCircle)`
   &:hover {

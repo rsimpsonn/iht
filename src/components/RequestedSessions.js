@@ -7,6 +7,9 @@ import userContext from "../contexts/userContext";
 import RequestedSession from "./RequestedSession";
 
 function RequestedSessions(props) {
+  if (!props.sessions) {
+    return <div />;
+  }
   return (
     <div>
       {props.sessions.length > 0 && <Header>Requested Sessions</Header>}

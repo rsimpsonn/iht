@@ -10,6 +10,7 @@ import getSubject from "../subjects";
 import Cog from "react-icons/lib/fa/cog";
 import Check from "react-icons/lib/fa/check-circle";
 import Times from "react-icons/lib/fa/times-circle";
+import { Popup } from "semantic-ui-react";
 
 class PastSession extends Component{
     state = {
@@ -89,18 +90,38 @@ class PastSession extends Component{
             {this.state.w.profilePic && (
               <Circle src={this.state.w.profilePic} />
             )}
+            
           </p>
+          
         )}
+        <Popup
+              trigger={<Notes>Notes</Notes>}
+              flowing
+              hoverable
+              onClick={() => window.alert("Notes")}
+            >
+              <p>
+                Notes
+              </p>
+            </Popup>
       </Box>
     );
   }
 
 }
 
+
+
 const Circle = styled.img`
   border-radius: 50%;
   width: 25px;
   height: 25px;
+`;
+
+const Notes = styled.p`
+  &:hover {
+    transform: scale(1.1);
+  }
 `;
 
 const Box = styled.div`

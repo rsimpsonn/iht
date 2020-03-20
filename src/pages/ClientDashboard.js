@@ -10,6 +10,7 @@ import userContext from "../contexts/userContext";
 import UpcomingSessions from "../components/UpcomingSessions";
 import ScheduleSessions from "../components/ScheduleSessions";
 import PastSessions from "../components/PastSessions";
+import RequestedSessions from "../components/RequestedSessions";
 //import PastSessions from "../components/PastSessions";
 
 class ClientDashboard extends Component {
@@ -80,6 +81,9 @@ class ClientDashboard extends Component {
           sessions={this.state.sessions.filter(s => s.status === "Upcoming")}
         />
         <ScheduleSessions client={this.state.client} />
+        <RequestedSessions
+          seassions={this.state.sessions.filter(s => s.status === "Requested")}
+        />
         <PastSessions
           sessions={this.state.sessions.filter(
             s =>

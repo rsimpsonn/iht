@@ -6,7 +6,7 @@ let loadedTutors = {
 
 const getTutor = async id => {
   if (loadedTutors[id]) {
-    console.log("subject already loaded");
+    console.log("tutor already loaded");
     return loadedTutors[id];
   }
 
