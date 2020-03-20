@@ -3,24 +3,25 @@ import styled from "styled-components";
 
 import firebase from "../firebase";
 import * as fb from "firebase";
-import getSubject from "../subjects";
 
 import userContext from "../contexts/userContext";
-import { AiOutlineSetting } from "react-icons/ai";
-import getEduLevel from "../educationLevels";
-import { Popup } from "semantic-ui-react";
+import getSubject from "../subjects";
 
-class UpcomingSession extends Component {
-  state = {
-    subject: "",
-    w: {
-      firstName: ""
-    },
-    level: "",
-    meetingWith: ""
-  };
+import Cog from "react-icons/lib/fa/cog";
+import Check from "react-icons/lib/fa/check-circle";
+import Times from "react-icons/lib/fa/times-circle";
 
-  static contextType = userContext;
+class PastSession extends Component{
+    state = {
+      subject: "",
+      w: {
+        firstName: "",
+        lastName: ""
+      }
+
+    };
+
+    static contextType = userContext;
 
   async componentDidMount() {
     const subject = await getSubject(this.props.session.subjectID);
@@ -32,44 +33,11 @@ class UpcomingSession extends Component {
         context.isTutor ? this.props.session.client : this.props.session.tutor
       );
     const w = await withRef.get();
-    const eduLevel = await getEduLevel(w.data().educationID);
     this.setState({
       subject: subject,
-      w: w.data(),
-      level: eduLevel
+      w: w.data()
     });
   }
-
-  respondToCancel(time) {
-    const docRef = firebase.db
-      .collection("sessions")
-      .doc(this.props.session.id);
-
-    const fee = time - Date.now();
-
-    if (fee <= 86400000) {
-      docRef.set(
-        {
-          status: "Cancelled fee"
-        },
-        { merge: true }
-      );
-    } else if (fee > 86400000) {
-      docRef.set(
-        {
-          status: "Cancelled no fee"
-        },
-        { merge: true }
-      );
-    }
-  }
-
-  confirmCancel(time) {
-    if (window.confirm("Are you sure you want to cancel this session?")) {
-      this.respondToCancel(time);
-    }
-  }
-
   render() {
     const startDate = this.props.session.start.toDate();
     const endDate = this.props.session.end.toDate();
@@ -97,26 +65,14 @@ class UpcomingSession extends Component {
       "November",
       "December"
     ];
-
     return (
       <Box>
         <Menu>
           {this.state.subject.title}
-          <Bar>
-            <Popup
-              trigger={<AiOutlineSetting color="#D8D8D8" size="20px" />}
-              position="bottom center"
-              flowing
-              hoverable
-              onClick={() => this.confirmCancel(startDate.getTime())}
-            >
-              <p>
-                <Cancel>Cancel</Cancel>
-              </p>
-            </Popup>
-          </Bar>
         </Menu>
-        <p>{this.state.level.title}</p>
+        <p>
+        {this.props.session.status}
+        </p>
         <p>
           {days[startDate.getDay()]}, {months[startDate.getMonth()]}{" "}
           {startDate.getDate()}
@@ -138,6 +94,7 @@ class UpcomingSession extends Component {
       </Box>
     );
   }
+
 }
 
 const Circle = styled.img`
@@ -150,12 +107,6 @@ const Box = styled.div`
   box-shadow: 0 0 20px #f6f6f6;
   padding: 15px;
   width: 15%;
-`;
-
-const Cancel = styled.p`
-  &:hover {
-    transform: scale(1.1);
-  }
 `;
 
 const Bar = styled.div`
@@ -171,4 +122,4 @@ const Menu = styled.div`
   justify-content: space-between;
 `;
 
-export default UpcomingSession;
+export default PastSession;

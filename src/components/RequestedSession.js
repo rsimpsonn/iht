@@ -9,7 +9,6 @@ import getSubject from "../subjects";
 import getEduLevel from "../educationLevels";
 
 import { AiFillCheckCircle, AiFillCloseCircle } from "react-icons/ai";
-import Times from "react-icons/ai";
 
 class RequestedSession extends Component {
   state = {
@@ -62,6 +61,18 @@ class RequestedSession extends Component {
     }
   }
 
+  confirmAccept() {
+    if (window.confirm("Are you sure you want to accept this session?")) {
+      this.respondToRequest(true);
+    }
+  }
+
+  confirmDecline() {
+    if (window.confirm("Are you sure you want to decline this session?")) {
+      this.respondToRequest(false);
+    }
+  }
+
   render() {
     const startDate = this.props.session.start.toDate();
     const endDate = this.props.session.end.toDate();
@@ -111,13 +122,13 @@ class RequestedSession extends Component {
               color="#09AA82"
               size={30}
               cursor="pointer"
-              onClick={() => this.respondToRequest(true)}
+              onClick={() => this.confirmAccept()}
             />
             <BetterX
               color="#ff8989"
               size={30}
               cursor="pointer"
-              onClick={() => this.respondToRequest(false)}
+              onClick={() => this.confirmDecline()}
             />
           </Row>
           <Bar>
