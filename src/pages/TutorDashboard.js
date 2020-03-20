@@ -25,7 +25,6 @@ class TutorDashboard extends Component {
     firebase.db
       .collection("sessions")
       .where(userType, "==", context.user.uid)
-      .where("end", ">=", new Date())
       .onSnapshot(snapshot => {
         snapshot.docChanges().forEach(change => {
           let newSessions = this.state.sessions;
@@ -51,6 +50,7 @@ class TutorDashboard extends Component {
   }
 
   render() {
+    console.log(this.state.sessions);
     return (
       <div>
         {this.state.alert && (

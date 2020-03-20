@@ -6,7 +6,7 @@ import * as fb from "firebase";
 import getSubject from "../subjects";
 
 import userContext from "../contexts/userContext";
-import Cog from "react-icons/lib/fa/cog";
+import { AiOutlineSetting } from "react-icons/ai";
 
 class UpcomingSession extends Component {
   state = {
@@ -68,7 +68,7 @@ class UpcomingSession extends Component {
         <Menu>
           {this.state.subject.title}
           <Bar>
-            <Cog color="#D8D8D8" size="20px" />
+            <AiOutlineSetting color="#D8D8D8" size="20px" />
           </Bar>
         </Menu>
         <p>

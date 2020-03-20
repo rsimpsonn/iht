@@ -35,7 +35,6 @@ class ClientDashboard extends Component {
     firebase.db
       .collection("sessions")
       .where(userType, "==", context.user.uid)
-      .where("end", ">=", new Date())
       .onSnapshot(snapshot => {
         snapshot.docChanges().forEach(change => {
           let newSessions = this.state.sessions;

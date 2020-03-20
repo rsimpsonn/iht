@@ -315,6 +315,14 @@
     "@babel/helper-plugin-utils" "^7.8.3"
     "@babel/plugin-syntax-dynamic-import" "^7.8.0"
 
+"@babel/plugin-proposal-export-default-from@^7.8.3":
+  version "7.8.3"
+  resolved "https://registry.yarnpkg.com/@babel/plugin-proposal-export-default-from/-/plugin-proposal-export-default-from-7.8.3.tgz#4cb7c2fdeaed490b60d9bfd3dc8a20f81f9c2e7c"
+  integrity sha512-PYtv2S2OdCdp7GSPDg5ndGZFm9DmWFvuLoS5nBxZCgOBggluLnhTScspJxng96alHQzPyrrHxvC9/w4bFuspeA==
+  dependencies:
+    "@babel/helper-plugin-utils" "^7.8.3"
+    "@babel/plugin-syntax-export-default-from" "^7.8.3"
+
 "@babel/plugin-proposal-json-strings@^7.8.3":
   version "7.8.3"
   resolved "https://registry.yarnpkg.com/@babel/plugin-proposal-json-strings/-/plugin-proposal-json-strings-7.8.3.tgz#da5216b238a98b58a1e05d6852104b10f9a70d6b"
@@ -391,6 +399,13 @@
   integrity sha512-5gdGbFon+PszYzqs83S3E5mpi7/y/8M9eC90MRTZfduQOYW76ig6SOSPNe41IG5LoP3FGBn2N0RjVDSQiS94kQ==
   dependencies:
     "@babel/helper-plugin-utils" "^7.8.0"
+
+"@babel/plugin-syntax-export-default-from@^7.8.3":
+  version "7.8.3"
+  resolved "https://registry.yarnpkg.com/@babel/plugin-syntax-export-default-from/-/plugin-syntax-export-default-from-7.8.3.tgz#f1e55ce850091442af4ba9c2550106035b29d678"
+  integrity sha512-a1qnnsr73KLNIQcQlcQ4ZHxqqfBKM6iNQZW2OMTyxNbA2WC7SHWHtGVpFzWtQAuS2pspkWVzdEBXXx8Ik0Za4w==
+  dependencies:
+    "@babel/helper-plugin-utils" "^7.8.3"
 
 "@babel/plugin-syntax-flow@^7.8.3":
   version "7.8.3"
@@ -7366,6 +7381,18 @@ mkdirp@^0.5.0:
   dependencies:
     minimist "^1.2.5"
 
+moment-timezone@^0.5.13:
+  version "0.5.28"
+  resolved "https://registry.yarnpkg.com/moment-timezone/-/moment-timezone-0.5.28.tgz#f093d789d091ed7b055d82aa81a82467f72e4338"
+  integrity sha512-TDJkZvAyKIVWg5EtVqRzU97w0Rb0YVbfpqyjgu6GwXCAohVRqwZjf4fOzDE6p1Ch98Sro/8hQQi65WDXW5STPw==
+  dependencies:
+    moment ">= 2.9.0"
+
+"moment@>= 2.9.0", moment@^2.18.1:
+  version "2.24.0"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.24.0.tgz#0d055d53f5052aa653c9f6eb68bb5d12bf5c2b5b"
+  integrity sha512-bV7f+6l2QigeBBZSM/6yTNq4P2fNpSWj/0e7jQcy87A8e7o2nAfP/34/2ky5Vw4B9S446EtIhodAzkFCcR4dQg==
+
 move-concurrently@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/move-concurrently/-/move-concurrently-1.0.1.tgz#be2c005fda32e0b29af1f05d7c4b33214c701f92"
@@ -9031,7 +9058,7 @@ prop-types-extra@^1.1.0:
     react-is "^16.3.2"
     warning "^4.0.0"
 
-prop-types@^15.6.1, prop-types@^15.6.2, prop-types@^15.7.2:
+prop-types@^15.5.8, prop-types@^15.6.1, prop-types@^15.6.2, prop-types@^15.7.2:
   version "15.7.2"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.7.2.tgz#52c41e75b8c87e72b9d9360e0206b99dcbffa6c5"
   integrity sha512-8QQikdH7//R2vurIJSutZ1smHYTcLpRWEOlHnzcWHmBYrOGUysKwSsrC89BCiFj3CbrfJ/nXFdJepOVrY1GCHQ==
@@ -9236,6 +9263,15 @@ react-app-polyfill@^1.0.6:
     regenerator-runtime "^0.13.3"
     whatwg-fetch "^3.0.0"
 
+react-available-times@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/react-available-times/-/react-available-times-1.4.0.tgz#146a3e7091bdef47d1c5f8875255b2e667e07c85"
+  integrity sha512-bAAATOGQ4RaTBTUxnsVNuGSOULQewbWueCJ4opXBYPHb9owN9MUvHnYuVhI0V5+oWhpNKtzi3j+6JjIW1ovQWQ==
+  dependencies:
+    moment "^2.18.1"
+    moment-timezone "^0.5.13"
+    prop-types "^15.5.8"
+
 react-bootstrap@^1.0.0-beta.17:
   version "1.0.0-beta.17"
   resolved "https://registry.yarnpkg.com/react-bootstrap/-/react-bootstrap-1.0.0-beta.17.tgz#09d4789633b2fb24d408fa493b4a80a496e87c82"
@@ -9306,17 +9342,12 @@ react-hooks@^1.0.1:
   resolved "https://registry.yarnpkg.com/react-hooks/-/react-hooks-1.0.1.tgz#e62197c38cd8d0703060f791234f7f4698aa7c44"
   integrity sha1-5iGXw4zY0HAwYPeRI09/RpiqfEQ=
 
-react-icon-base@2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/react-icon-base/-/react-icon-base-2.1.0.tgz#a196e33fdf1e7aaa1fda3aefbb68bdad9e82a79d"
-  integrity sha1-oZbjP98eeqof2jrvu2i9rZ6Cp50=
-
-react-icons@^2:
-  version "2.2.7"
-  resolved "https://registry.yarnpkg.com/react-icons/-/react-icons-2.2.7.tgz#d7860826b258557510dac10680abea5ca23cf650"
-  integrity sha512-0n4lcGqzJFcIQLoQytLdJCE0DKSA9dkwEZRYoGrIDJZFvIT6Hbajx5mv9geqhqFiNjUgtxg8kPyDfjlhymbGFg==
+react-icons@^3.9.0:
+  version "3.9.0"
+  resolved "https://registry.yarnpkg.com/react-icons/-/react-icons-3.9.0.tgz#89a00f20a0e02e6bfd899977eaf46eb4624239d5"
+  integrity sha512-gKbYKR+4QsD3PmIHLAM9TDDpnaTsr3XZeK1NTAb6WQQ+gxEdJ0xuCgLq0pxXdS7Utg2AIpcVhM1ut/jlDhcyNg==
   dependencies:
-    react-icon-base "2.1.0"
+    camelcase "^5.0.0"
 
 react-is@^16.12.0, react-is@^16.3.2, react-is@^16.6.0, react-is@^16.6.3, react-is@^16.7.0, react-is@^16.8.6:
   version "16.13.0"

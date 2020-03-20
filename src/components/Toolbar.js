@@ -5,8 +5,15 @@ import userContext from "../contexts/userContext";
 import { Popup } from "semantic-ui-react";
 import getTutor from "../tutors.js";
 import firebase from "../firebase";
+import { withRouter } from "react-router-dom";
 
-function Toolbar() {
+import {
+  AiOutlineBell,
+  AiOutlineCalendar,
+  AiOutlineHome
+} from "react-icons/ai";
+
+function Toolbar(props) {
   return (
     <userContext.Consumer>
       {context => (
@@ -14,29 +21,54 @@ function Toolbar() {
           <Header>
             <StyledLink to="/">Ivy Home Tutors</StyledLink>
           </Header>
-          <Bar>
-            {context.user == null && (
-              <Header>
-                <StyledLink to="/signin">Sign In</StyledLink>
-              </Header>
-            )}
-            {context.user != null && (
-              <Header>
-                <StyledLink to="/dashboard">Dashboard</StyledLink>
-                <button onClick={() => firebase.auth.signOut()}>
-                  Sign Out
-                </button>
+          {context.user == null && (
+            <ListItem bold onClick={() => props.history.push("/signin")} />
+          )}
+          {context.user != null && (
+            <Bar>
+              <Icon onClick={() => props.history.push("/dashboard")}>
+                <AiOutlineHome size={30} />
+                <ListItem bold>Dashboard</ListItem>
+              </Icon>
+              <Icon onClick={() => props.history.push("/calendar")}>
+                <AiOutlineCalendar size={30} />
+                <ListItem bold>Calendar</ListItem>
+              </Icon>
+              <Popup
+                trigger={
+                  <Icon>
+                    <AiOutlineBell size={30} />
+                    <ListItem bold>Alerts</ListItem>
+                  </Icon>
+                }
+                flowing
+                hoverable
+                position="bottom center"
+              />
+              <Icon>
                 <Popup
                   trigger={<Circle />}
-                  position="bottom center"
+                  position="bottom right"
                   flowing
                   hoverable
                 >
-                  <p>Settings</p>
+                  <ListItem onClick={() => props.history.push("/settings")}>
+                    Settings
+                  </ListItem>
+                  {context.isTutor && (
+                    <ListItem
+                      onClick={() => props.history.push("/availability")}
+                    >
+                      Set Availability
+                    </ListItem>
+                  )}
+                  <ListItem onClick={() => firebase.auth.signOut()}>
+                    Sign Out
+                  </ListItem>
                 </Popup>
-              </Header>
-            )}
-          </Bar>
+              </Icon>
+            </Bar>
+          )}
         </Menu>
       )}
     </userContext.Consumer>
@@ -47,6 +79,7 @@ const Bar = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: end;
+  align-items: center;
 `;
 
 const Menu = styled.div`
@@ -54,12 +87,26 @@ const Menu = styled.div`
   flex-direction: row;
   width: 100%;
   justify-content: space-between;
+  align-items: center;
+  padding: 2%;
 `;
 
 const Header = styled.p`
   font-size: 20px;
   font-family: Lato;
   font-weight: Bold;
+`;
+
+const ListItem = styled.p`
+  font-size: 15px;
+  font-family: Lato;
+  cursor: pointer;
+
+  ${props =>
+    props.bold &&
+    `
+    font-weight: Bold;
+    `}
 `;
 
 const StyledLink = styled(Link)`
@@ -81,4 +128,13 @@ const Circle = styled.img`
   background-color: black;
 `;
 
-export default Toolbar;
+const Icon = styled.div`
+  margin: 0 10px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+`;
+
+export default withRouter(Toolbar);

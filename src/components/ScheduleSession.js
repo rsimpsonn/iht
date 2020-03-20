@@ -5,7 +5,7 @@ import styled from "styled-components";
 import getSubject from "../subjects";
 
 import firebase from "../firebase";
-import Star from "react-icons/lib/fa/star";
+import { AiFillStar } from "react-icons/ai";
 
 class ScheduleSession extends Component {
   constructor(props) {
@@ -117,7 +117,7 @@ class ScheduleSession extends Component {
   }
 }
 
-const BetterStar = styled(Star)`
+const BetterStar = styled(AiFillStar)`
   color: #f3f3f3;
 
   ${props =>

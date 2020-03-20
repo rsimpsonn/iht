@@ -11,7 +11,7 @@ function Dashboard() {
       {context => (
         <div>
           {context.isTutor && <TutorDashboard />}
-          {!context.isTutor && <ClientDashboard />}
+          {!(context.user === null) && !context.isTutor && <ClientDashboard />}
         </div>
       )}
     </userContext.Consumer>

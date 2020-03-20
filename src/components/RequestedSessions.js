@@ -29,7 +29,6 @@ const Bar = styled.div`
   display: flex;
   padding: 2%;
   flex-direction: row;
-  overflow: scroll;
 `;
 
 export default RequestedSessions;

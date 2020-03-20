@@ -8,9 +8,8 @@ import userContext from "../contexts/userContext";
 import getSubject from "../subjects";
 import getEduLevel from "../educationLevels";
 
-import Cog from "react-icons/lib/fa/cog";
-import Check from "react-icons/lib/fa/check-circle";
-import Times from "react-icons/lib/fa/times-circle";
+import { AiFillCheckCircle, AiFillCloseCircle } from "react-icons/ai";
+import Times from "react-icons/ai";
 
 class RequestedSession extends Component {
   state = {
@@ -64,10 +63,8 @@ class RequestedSession extends Component {
   }
 
   render() {
-    const startTs = new fb.firestore.Timestamp(this.props.session.start, 0);
-    const startDate = startTs.toDate();
-    const endTs = new fb.firestore.Timestamp(this.props.session.end, 0);
-    const endDate = endTs.toDate();
+    const startDate = this.props.session.start.toDate();
+    const endDate = this.props.session.end.toDate();
 
     const days = [
       "Sunday",
@@ -78,6 +75,7 @@ class RequestedSession extends Component {
       "Friday",
       "Saturday"
     ];
+
     const months = [
       "January",
       "February",
@@ -138,13 +136,13 @@ class RequestedSession extends Component {
   }
 }
 
-const BetterCheck = styled(Check)`
+const BetterCheck = styled(AiFillCheckCircle)`
   &:hover {
     transform: scale(1.1);
   }
 `;
 
-const BetterX = styled(Times)`
+const BetterX = styled(AiFillCloseCircle)`
   &:hover {
     transform: scale(1.1);
   }

@@ -11,6 +11,8 @@ import {
 import Landing from "./pages/Landing";
 import SignIn from "./pages/SignIn";
 import Dashboard from "./pages/Dashboard";
+import Availability from "./pages/Availability";
+
 import Toolbar from "./components/Toolbar";
 
 import firebase from "./firebase";
@@ -57,6 +59,9 @@ function App() {
       <Router>
         <Toolbar />
         <Switch>
+          <Route path="/availability">
+            <Availability />
+          </Route>
           <Route path="/dashboard">
             <Dashboard />
           </Route>
