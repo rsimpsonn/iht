@@ -1,5 +1,7 @@
 import React, { Component } from "react";
-import { Dropdown, TextArea } from "semantic-ui-react";
+import { Dropdown, TextArea, Popup } from "semantic-ui-react";
+
+import AvailableTimes from "./AvailableTimes";
 
 import styled from "styled-components";
 import getSubject from "../subjects";
@@ -43,23 +45,17 @@ class ScheduleSession extends Component {
   }
 
   requestSession() {
-    if (
-      !this.state.selectedSubject ||
-      !this.state.selectedLength ||
-      !this.state.selectedDateTime
-    ) {
+    if (!this.state.selectedSubject || !this.state.selectedTimeSlot) {
       alert("Please fill out all fields");
     } else {
-      firebase.collection("sessions").add({
+      firebase.db.collection("sessions").add({
         client: this.props.client.id,
-        start: this.state.selectedDateTime,
-        end: new Date(
-          this.state.selectedDateTime.getTime() +
-            this.state.selectedLength * 60000
-        ),
+        start: this.state.selectedTimeSlot.start,
+        end: this.state.selectedTimeSlot.end,
         status: "Requested",
         subjectID: this.state.selectedSubject,
-        tutor: this.props.tutor.id
+        tutor: this.props.tutor.id,
+        additionalInfo: this.state.additionalInfo
       });
     }
   }
@@ -73,17 +69,13 @@ class ScheduleSession extends Component {
       };
     });
 
-    const timeOptions = this.props.tutor.timePref.map(t => {
-      const remainder = t % 60;
-      const hours = (t - remainder) / 60;
-      return {
-        key: t,
-        text:
-          (hours < 1 ? "" : Math.floor(hours) + "hr ") +
-          (remainder === 0 ? "" : remainder + "min"),
-        value: t
-      };
-    });
+    const s = this.state.selectedTimeSlot;
+
+    const selectTimeText = s
+      ? (s.start.getHours() % 12 === 0 ? 12 : s.start.getHours() % 12) +
+        " - " +
+        (s.end.getHours() % 12 === 0 ? 12 : s.end.getHours() % 12)
+      : "Select Time";
 
     return (
       <Box>
@@ -101,15 +93,23 @@ class ScheduleSession extends Component {
           options={subjectOptions}
           onChange={(e, data) => this.setState({ selectedSubject: data.value })}
         />
-        <Dropdown
-          placeholder="Length"
-          fluid
-          selection
-          options={timeOptions}
-          onChange={(e, data) => this.setState({ selectedTime: data.value })}
+        <Popup trigger={<p>{selectTimeText}</p>} hoverable fluid flowing>
+          <AvailableTimes
+            callback={selectedTimeSlot => this.setState({ selectedTimeSlot })}
+            tutor={this.props.tutor}
+            selected={
+              this.state.selectedTimeSlot
+                ? this.state.selectedTimeSlot.start.getTime()
+                : false
+            }
+          />
+        </Popup>
+        <TextArea
+          onChange={e => this.setState({ additionalInfo: e.target.value })}
+          placeholder="Additional information"
+          rows={2}
         />
-        <TextArea placeholder="Additional information" rows={2} />
-        <GreenButton onClick={this.requestSession} cursor="pointer">
+        <GreenButton onClick={this.requestSession}>
           <ButtonText>Request Session</ButtonText>
         </GreenButton>
       </Box>
@@ -152,6 +152,7 @@ const GreenButton = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  cursor: pointer;
 
   &:hover {
     transform: scale(1.1);

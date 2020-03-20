@@ -32,7 +32,12 @@ class UpcomingSession extends Component {
         context.isTutor ? this.props.session.client : this.props.session.tutor
       );
     const w = await withRef.get();
-    const eduLevel = await getEduLevel(w.data().educationID);
+    let eduLevel = false;
+
+    if (context.isTutor) {
+      eduLevel = await getEduLevel(w.data().educationID);
+    }
+
     this.setState({
       subject: subject,
       w: w.data(),
