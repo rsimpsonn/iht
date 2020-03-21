@@ -17,6 +17,7 @@ import Toolbar from "./components/Toolbar";
 
 import firebase from "./firebase";
 import userContext from "./contexts/userContext";
+import alertContext from "./contexts/alertContext";
 
 function App() {
   const useAuth = () => {
@@ -56,23 +57,25 @@ function App() {
 
   return (
     <userContext.Provider value={{ user, isTutor }}>
-      <Router>
-        <Toolbar />
-        <Switch>
-          <Route path="/availability">
-            <Availability />
-          </Route>
-          <Route path="/dashboard">
-            <Dashboard />
-          </Route>
-          <Route path="/signin">
-            <SignIn />
-          </Route>
-          <Route path="/">
-            <Landing />
-          </Route>
-        </Switch>
-      </Router>
+      <alertContext.Provider value={{ alerts: [], bannerAlert: false }}>
+        <Router>
+          <Toolbar />
+          <Switch>
+            <Route path="/availability">
+              <Availability />
+            </Route>
+            <Route path="/dashboard">
+              <Dashboard />
+            </Route>
+            <Route path="/signin">
+              <SignIn />
+            </Route>
+            <Route path="/">
+              <Landing />
+            </Route>
+          </Switch>
+        </Router>
+      </alertContext.Provider>
     </userContext.Provider>
   );
 }
