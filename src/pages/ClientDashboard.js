@@ -82,7 +82,7 @@ class ClientDashboard extends Component {
         />
         <ScheduleSessions client={this.state.client} />
         <RequestedSessions
-          seassions={this.state.sessions.filter(s => s.status === "Requested")}
+          sessions={this.state.sessions.filter(s => s.status === "Requested")}
         />
         <PastSessions
           sessions={this.state.sessions.filter(

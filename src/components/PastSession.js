@@ -7,10 +7,6 @@ import * as fb from "firebase";
 import userContext from "../contexts/userContext";
 import getSubject from "../subjects";
 
-
-import Cog from "react-icons/lib/fa/cog";
-import Check from "react-icons/lib/fa/check-circle";
-import Times from "react-icons/lib/fa/times-circle";
 import { Popup } from "semantic-ui-react";
 
 class PastSession extends Component {

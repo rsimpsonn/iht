@@ -7,6 +7,8 @@ import * as fb from "firebase";
 import userContext from "../contexts/userContext";
 import getSubject from "../subjects";
 import getEduLevel from "../educationLevels";
+import { Popup } from "semantic-ui-react";
+import { AiOutlineSetting } from "react-icons/ai";
 
 import { AiFillCheckCircle, AiFillCloseCircle } from "react-icons/ai";
 
@@ -76,6 +78,12 @@ class RequestedSession extends Component {
     }
   }
 
+  confirmCancel(time) {
+    if (window.confirm("Are you sure you want to cancel this request?")) {
+      this.respondToRequest(false);
+    }
+  }
+
 
   render() {
     const startDate = this.props.session.start.toDate();
@@ -105,7 +113,7 @@ class RequestedSession extends Component {
       "November",
       "December"
     ];
-
+    if(this.context.isTutor){
     return (
       <Box>
         <Menu>{this.state.subject.title}</Menu>
@@ -120,7 +128,7 @@ class RequestedSession extends Component {
           {endDate.getHours() % 12 == 0 ? 12 : endDate.getHours() % 12}:
           {endDate.getMinutes()}
         </p>
-        <Menu>
+        <Menu> 
           <Row>
             <BetterCheck
               color="#09AA82"
@@ -148,7 +156,52 @@ class RequestedSession extends Component {
         </Menu>
       </Box>
     );
+  } else{
+    return(
+    <Box>
+        <Menu>
+        {this.state.subject.title}
+        <Bar>
+            <Popup
+              trigger={<AiOutlineSetting color="#D8D8D8" size="20px" />}
+              position="bottom center"
+              flowing
+              hoverable
+              onClick={() => this.confirmCancel()}
+            >
+              <p>
+                <Cancel>Cancel</Cancel>
+              </p>
+            </Popup>
+          </Bar>
+        </Menu>
+        <p>{this.state.level.title}</p>
+        <p>
+          {days[startDate.getDay()]}, {months[startDate.getMonth()]}{" "}
+          {startDate.getDate()}
+        </p>
+        <p>
+          {startDate.getHours() % 12 == 0 ? 12 : startDate.getHours() % 12}:
+          {startDate.getMinutes()} -{" "}
+          {endDate.getHours() % 12 == 0 ? 12 : endDate.getHours() % 12}:
+          {endDate.getMinutes()}
+        </p>
+        <Menu> 
+          <Bar>
+            {this.state.meetingWith && (
+              <p>
+                With {this.state.meetingWith.firstName}{" "}
+                {this.state.meetingWith.profilePic && (
+                  <Circle src={this.state.meetingWith.profilePic} />
+                )}
+              </p>
+            )}
+          </Bar>
+        </Menu>
+      </Box>
+    );
   }
+}
 }
 
 
@@ -192,6 +245,12 @@ const Menu = styled.div`
 const Row = styled.div`
   display: flex;
   flex-direction: row;
+`;
+
+const Cancel = styled.p`
+  &:hover {
+    transform: scale(1.1);
+  }
 `;
 
 export default RequestedSession;
