@@ -21,10 +21,11 @@ class ScheduleSession extends Component {
     subjectsAvailable: [],
     additionalInfo: "",
     frontSide: true,
-    university: "",
+    university: ""
   };
 
   async componentDidMount() {
+    console.log(this.props.tutor);
     let prefType = "";
     const university = await getUniversity(this.props.tutor.universityID);
 
@@ -50,7 +51,6 @@ class ScheduleSession extends Component {
     this.setState({
       university: university
     });
-
   }
 
   requestSession() {
@@ -95,16 +95,18 @@ class ScheduleSession extends Component {
             <Bar>
               <BetterStar size={25} favorite={this.props.favorite} />
               <Popup
-              trigger={<Circle src={this.props.tutor.profilePic} />}
-              position="top center"
-              flowing
-              hoverable
-              onClick={() => this.setState({ frontSide: !this.state.frontSide})}
-            >
-              <p>
-                <Info>More Info</Info>
-              </p>
-            </Popup>
+                trigger={<Circle src={this.props.tutor.profilePic} />}
+                position="top center"
+                flowing
+                hoverable
+                onClick={() =>
+                  this.setState({ frontSide: !this.state.frontSide })
+                }
+              >
+                <p>
+                  <Info>More Info</Info>
+                </p>
+              </Popup>
             </Bar>
           </Menu>
           <Dropdown
@@ -147,26 +149,25 @@ class ScheduleSession extends Component {
               <Circle src={this.props.tutor.profilePic} />
             </Bar>
           </Menu>
-<<<<<<< HEAD
           <p>
-            {this.props.tutor.year} {","} {this.props.tutor.universityID}
+            {this.props.tutor.year} {","} {this.state.university.title}
           </p>
-=======
-          <p>{this.props.tutor.year} {","} {this.state.university.title}</p>
->>>>>>> eb052f48622962f2110ebf457d9b24a8dad0447c
           <p>{"Studying" + " " + this.props.tutor.majorID}</p>
           <p>{this.props.tutor.bio}</p>
 
           <Menu>
-          <BetterStar size={25} favorite={this.props.favorite} />
-          <BetterStar size={25} favorite={this.props.favorite} />
-          <BetterStar size={25} favorite={this.props.favorite} />
-          <BetterStar size={25} favorite={this.props.favorite} />
-          <BetterStar size={25} favorite={this.props.favorite} />
-          <GreenButton
-          onClick={() => this.setState({ frontSide: !this.state.frontSide})}>
-            <ButtonText>Schedule</ButtonText>
-          </GreenButton>
+            <BetterStar size={25} favorite={this.props.favorite} />
+            <BetterStar size={25} favorite={this.props.favorite} />
+            <BetterStar size={25} favorite={this.props.favorite} />
+            <BetterStar size={25} favorite={this.props.favorite} />
+            <BetterStar size={25} favorite={this.props.favorite} />
+            <GreenButton
+              onClick={() =>
+                this.setState({ frontSide: !this.state.frontSide })
+              }
+            >
+              <ButtonText>Schedule</ButtonText>
+            </GreenButton>
           </Menu>
           <p>{this.props.tutor.sessions + " sessions"}</p>
         </Box>

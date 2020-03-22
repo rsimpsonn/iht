@@ -18,14 +18,22 @@ class ScheduleSessions extends Component {
     searchOpen: false
   };
 
-  componentDidMount() {
-    Promise.all(this.props.client.favorites.map(f => getTutor(f))).then(
-      favorites => this.setState({ favorites })
-    );
+  async componentDidMount() {
+    let favorites = [];
+
+    this.props.client.favorites.forEach(async f => {
+      const t = await getTutor(f);
+      favorites.push(t);
+
+      if (this.props.client.favorites.length === favorites.length) {
+        this.setState({
+          favorites
+        });
+      }
+    });
   }
 
   render() {
-    console.log(this.state.favorites);
     return (
       <div>
         <Header>Schedule sessions</Header>
