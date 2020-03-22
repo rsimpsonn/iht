@@ -8,6 +8,7 @@ import getSubject from "../subjects";
 
 import firebase from "../firebase";
 import { AiFillStar } from "react-icons/ai";
+import getUniversity from "../universities";
 
 class ScheduleSession extends Component {
   constructor(props) {
@@ -20,10 +21,12 @@ class ScheduleSession extends Component {
     subjectsAvailable: [],
     additionalInfo: "",
     frontSide: true,
+    university: "",
   };
 
   async componentDidMount() {
     let prefType = "";
+    const university = await getUniversity(this.props.tutor.universityID);
 
     switch (this.props.client.educationID) {
       case "0":
@@ -43,6 +46,10 @@ class ScheduleSession extends Component {
         subjectsAvailable => this.setState({ subjectsAvailable })
       );
     }
+
+    this.setState({
+      university: university
+    });
 
   }
 
@@ -92,7 +99,7 @@ class ScheduleSession extends Component {
               position="top center"
               flowing
               hoverable
-              onclick={() => this.setState({ frontSide: !this.state.frontSide})}
+              onClick={() => this.setState({ frontSide: !this.state.frontSide})}
             >
               <p>
                 <Info>More Info</Info>
@@ -140,7 +147,7 @@ class ScheduleSession extends Component {
               <Circle src={this.props.tutor.profilePic} />
             </Bar>
           </Menu>
-          <p>{this.props.tutor.year} {","} {this.props.tutor.universityID}</p>
+          <p>{this.props.tutor.year} {","} {this.state.university.title}</p>
           <p>{"Studying" + " " + this.props.tutor.majorID}</p>
           <p>{this.props.tutor.bio}</p>
 
@@ -151,7 +158,7 @@ class ScheduleSession extends Component {
           <BetterStar size={25} favorite={this.props.favorite} />
           <BetterStar size={25} favorite={this.props.favorite} />
           <GreenButton 
-          onclick={() => this.setState({ frontSide: !this.state.frontSide})}>
+          onClick={() => this.setState({ frontSide: !this.state.frontSide})}>
             <ButtonText>Schedule</ButtonText>
           </GreenButton>
           </Menu>
