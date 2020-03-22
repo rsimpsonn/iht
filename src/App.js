@@ -36,8 +36,11 @@ function App() {
         const ref = firebase.db.collection("users").doc(user.uid);
         const doc = await ref.get();
         isTutor = doc.data().isTutor;
+
+        setState({ initializing: false, user, isTutor });
+      } else {
+        setState({ initializing: false, user, isTutor });
       }
-      setState({ initializing: false, user, isTutor });
     }
 
     React.useEffect(() => {
@@ -57,25 +60,23 @@ function App() {
 
   return (
     <userContext.Provider value={{ user, isTutor }}>
-      <alertContext.Provider value={{ alerts: [], bannerAlert: false }}>
-        <Router>
-          <Toolbar />
-          <Switch>
-            <Route path="/availability">
-              <Availability />
-            </Route>
-            <Route path="/dashboard">
-              <Dashboard />
-            </Route>
-            <Route path="/signin">
-              <SignIn />
-            </Route>
-            <Route path="/">
-              <Landing />
-            </Route>
-          </Switch>
-        </Router>
-      </alertContext.Provider>
+      <Router>
+        <Toolbar />
+        <Switch>
+          <Route path="/availability">
+            <Availability />
+          </Route>
+          <Route path="/dashboard">
+            <Dashboard />
+          </Route>
+          <Route path="/signin">
+            <SignIn />
+          </Route>
+          <Route path="/">
+            <Landing />
+          </Route>
+        </Switch>
+      </Router>
     </userContext.Provider>
   );
 }

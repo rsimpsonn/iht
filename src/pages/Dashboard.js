@@ -11,21 +11,10 @@ function Dashboard() {
   return (
     <userContext.Consumer>
       {userContext => (
-        <alertContext.Consumer>
-          {alertContext => (
-            <div>
-              {alertContext.bannerAlert && (
-                <AlertBar>
-                  <AlertText>{alertContext.bannerAlert.message}</AlertText>
-                </AlertBar>
-              )}
-              {userContext.isTutor && <TutorDashboard />}
-              {!(userContext.user === null) && !userContext.isTutor && (
-                <ClientDashboard />
-              )}
-            </div>
-          )}
-        </alertContext.Consumer>
+        <div>
+          {userContext.isTutor && <TutorDashboard />}
+          {userContext.user && !userContext.isTutor && <ClientDashboard />}
+        </div>
       )}
     </userContext.Consumer>
   );

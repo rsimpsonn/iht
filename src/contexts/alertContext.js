@@ -1,9 +1,7 @@
 import React from "react";
 
 const alertContext = React.createContext({
-  alerts: [],
-  bannerAlert: false,
-  addAlerts: () => {}
+  alerts: []
 });
 
 export default alertContext;
