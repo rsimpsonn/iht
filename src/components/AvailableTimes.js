@@ -10,6 +10,7 @@ class AvailableTimes extends Component {
     super(props);
 
     this.hourSlots = this.hourSlots.bind(this);
+    this.getOverlappingSessions = this.getOverlappingSessions.bind(this);
   }
 
   state = {};
@@ -21,7 +22,10 @@ class AvailableTimes extends Component {
 
     const snapshot = await availRef.get();
 
+    const overlappingSessions = await this.getOverlappingSessions();
+
     this.setState({
+      overlappingSessions,
       availableTimes: snapshot.docs.map(d => {
         return {
           start: d.data().start.toDate(),
@@ -51,6 +55,35 @@ class AvailableTimes extends Component {
     return hourSlots;
   }
 
+  async getOverlappingSessions() {
+    const now = new Date();
+
+    let daysInAdvance = 9;
+    if (now.getDay() !== 6) {
+      daysInAdvance -= now.getDay() + 1;
+    }
+
+    let advance = new Date();
+    advance.setDate(advance.getDate() + daysInAdvance);
+    advance.setHours(22);
+
+    const sessionRef = firebase.db
+      .collection("sessions")
+      .where("tutor", "==", this.props.tutor.id)
+      .where("start", ">=", now)
+      .where("start", "<", advance)
+      .where("status", "in", ["Upcoming", "Requested"]);
+
+    const snapshot = await sessionRef.get();
+
+    return snapshot.docs.map(s => {
+      return {
+        start: s.data().start.toDate(),
+        end: s.data().start.toDate()
+      };
+    });
+  }
+
   render() {
     if (!this.state.availableTimes) {
       return <p>Loading</p>;
@@ -63,9 +96,16 @@ class AvailableTimes extends Component {
       daysInAdvance -= now.getDay() + 1;
     }
 
-    const hourSlots = this.hourSlots().filter(
-      d => d.start > new Date(now.getTime()).setHours(now.getHours() + 1)
-    );
+    const hourSlots = this.hourSlots()
+      .filter(
+        d => d.start > new Date(now.getTime()).setHours(now.getHours() + 1)
+      )
+      .filter(
+        s =>
+          !this.state.overlappingSessions.some(
+            o => s.start.getHours() === o.start.getHours()
+          )
+      );
     const range = Array.from(Array(daysInAdvance).keys());
 
     return (

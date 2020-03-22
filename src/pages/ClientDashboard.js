@@ -67,16 +67,6 @@ class ClientDashboard extends Component {
     }
     return (
       <div>
-        {this.state.alert && (
-          <AlertBar>
-            <AlertText>
-              {this.state.alert.message}
-              <Link to={this.state.alert.link}>
-                {this.state.alert.linkMessage}
-              </Link>
-            </AlertText>
-          </AlertBar>
-        )}
         <UpcomingSessions
           sessions={this.state.sessions.filter(s => s.status === "Upcoming")}
         />

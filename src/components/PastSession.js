@@ -18,7 +18,6 @@ class PastSession extends Component {
     }
   };
 
-
   static contextType = userContext;
 
   async componentDidMount() {
@@ -83,26 +82,20 @@ class PastSession extends Component {
             {this.state.w.profilePic && (
               <Circle src={this.state.w.profilePic} />
             )}
-            
           </p>
-          
         )}
         <Popup
-              trigger={<Notes>Notes</Notes>}
-              flowing
-              hoverable
-              onClick={() => window.alert("Notes")}
-            >
-              <p>
-                Notes
-              </p>
-            </Popup>
+          trigger={<Notes>Notes</Notes>}
+          flowing
+          hoverable
+          onClick={() => window.alert("Notes")}
+        >
+          <p>Notes</p>
+        </Popup>
       </Box>
     );
   }
 }
-
-
 
 const Circle = styled.img`
   border-radius: 50%;

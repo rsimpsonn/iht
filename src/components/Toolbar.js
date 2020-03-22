@@ -6,6 +6,7 @@ import { Popup } from "semantic-ui-react";
 import getTutor from "../tutors.js";
 import firebase from "../firebase";
 import { withRouter } from "react-router-dom";
+import Alerts from "./Alerts";
 
 import {
   AiOutlineBell,
@@ -25,7 +26,6 @@ function Toolbar(props) {
             <ListItem bold onClick={() => props.history.push("/signin")}>
               Sign In
             </ListItem>
-
           )}
           {context.user != null && (
             <Bar>
@@ -37,17 +37,7 @@ function Toolbar(props) {
                 <AiOutlineCalendar size={30} />
                 <ListItem bold>Calendar</ListItem>
               </Icon>
-              <Popup
-                trigger={
-                  <Icon>
-                    <AiOutlineBell size={30} />
-                    <ListItem bold>Alerts</ListItem>
-                  </Icon>
-                }
-                flowing
-                hoverable
-                position="bottom center"
-              />
+              <Alerts />
               <Icon>
                 <Popup
                   trigger={<Circle />}

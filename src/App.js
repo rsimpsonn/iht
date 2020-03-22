@@ -17,6 +17,7 @@ import Toolbar from "./components/Toolbar";
 
 import firebase from "./firebase";
 import userContext from "./contexts/userContext";
+import alertContext from "./contexts/alertContext";
 
 function App() {
   const useAuth = () => {
@@ -35,8 +36,11 @@ function App() {
         const ref = firebase.db.collection("users").doc(user.uid);
         const doc = await ref.get();
         isTutor = doc.data().isTutor;
+
+        setState({ initializing: false, user, isTutor });
+      } else {
+        setState({ initializing: false, user, isTutor });
       }
-      setState({ initializing: false, user, isTutor });
     }
 
     React.useEffect(() => {

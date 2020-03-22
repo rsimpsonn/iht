@@ -52,16 +52,6 @@ class TutorDashboard extends Component {
   render() {
     return (
       <div>
-        {this.state.alert && (
-          <AlertBar>
-            <AlertText>
-              {this.state.alert.message}
-              <Link to={this.state.alert.link}>
-                {this.state.alert.linkMessage}
-              </Link>
-            </AlertText>
-          </AlertBar>
-        )}
         <UpcomingSessions
           sessions={this.state.sessions.filter(s => s.status === "Upcoming")}
         />
@@ -81,16 +71,5 @@ class TutorDashboard extends Component {
     );
   }
 }
-
-const AlertText = styled.div`
-  font-size: 14px;
-  color: white;
-  font-family: Lato;
-`;
-
-const AlertBar = styled.div`
-  padding: 2%;
-  color: #09aa82;
-`;
 
 export default TutorDashboard;

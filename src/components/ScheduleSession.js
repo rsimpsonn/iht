@@ -21,10 +21,11 @@ class ScheduleSession extends Component {
     subjectsAvailable: [],
     additionalInfo: "",
     frontSide: true,
-    university: "",
+    university: ""
   };
 
   async componentDidMount() {
+    console.log(this.props.tutor);
     let prefType = "";
     const university = await getUniversity(this.props.tutor.universityID);
 
@@ -50,7 +51,6 @@ class ScheduleSession extends Component {
     this.setState({
       university: university
     });
-
   }
 
   requestSession() {
@@ -86,25 +86,27 @@ class ScheduleSession extends Component {
         (s.end.getHours() % 12 === 0 ? 12 : s.end.getHours() % 12)
       : "Select Time";
 
-    if(this.state.frontSide){
+    if (this.state.frontSide) {
       return (
         <Box>
           <Menu>
             {this.props.tutor.firstName}
-            
+
             <Bar>
               <BetterStar size={25} favorite={this.props.favorite} />
               <Popup
-              trigger={<Circle src={this.props.tutor.profilePic} />}
-              position="top center"
-              flowing
-              hoverable
-              onClick={() => this.setState({ frontSide: !this.state.frontSide})}
-            >
-              <p>
-                <Info>More Info</Info>
-              </p>
-            </Popup>
+                trigger={<Circle src={this.props.tutor.profilePic} />}
+                position="top center"
+                flowing
+                hoverable
+                onClick={() =>
+                  this.setState({ frontSide: !this.state.frontSide })
+                }
+              >
+                <p>
+                  <Info>More Info</Info>
+                </p>
+              </Popup>
             </Bar>
           </Menu>
           <Dropdown
@@ -112,7 +114,9 @@ class ScheduleSession extends Component {
             fluid
             selection
             options={subjectOptions}
-            onChange={(e, data) => this.setState({ selectedSubject: data.value })}
+            onChange={(e, data) =>
+              this.setState({ selectedSubject: data.value })
+            }
           />
           <Popup trigger={<p>{selectTimeText}</p>} hoverable fluid flowing>
             <AvailableTimes
@@ -124,7 +128,7 @@ class ScheduleSession extends Component {
                   : false
               }
             />
-          </Popup> 
+          </Popup>
           <TextArea
             onChange={e => this.setState({ additionalInfo: e.target.value })}
             placeholder="Additional information"
@@ -134,39 +138,41 @@ class ScheduleSession extends Component {
             <ButtonText>Request Session</ButtonText>
           </GreenButton>
         </Box>
-
-        
       );
-     } else{
+    } else {
       return (
         <Box>
           <Menu>
             {this.props.tutor.firstName}
             <Bar>
-             <BetterStar size={25} favorite={this.props.favorite} />
+              <BetterStar size={25} favorite={this.props.favorite} />
               <Circle src={this.props.tutor.profilePic} />
             </Bar>
           </Menu>
-          <p>{this.props.tutor.year} {","} {this.state.university.title}</p>
+          <p>
+            {this.props.tutor.year} {","} {this.state.university.title}
+          </p>
           <p>{"Studying" + " " + this.props.tutor.majorID}</p>
           <p>{this.props.tutor.bio}</p>
 
           <Menu>
-          <BetterStar size={25} favorite={this.props.favorite} />
-          <BetterStar size={25} favorite={this.props.favorite} />
-          <BetterStar size={25} favorite={this.props.favorite} />
-          <BetterStar size={25} favorite={this.props.favorite} />
-          <BetterStar size={25} favorite={this.props.favorite} />
-          <GreenButton 
-          onClick={() => this.setState({ frontSide: !this.state.frontSide})}>
-            <ButtonText>Schedule</ButtonText>
-          </GreenButton>
+            <BetterStar size={25} favorite={this.props.favorite} />
+            <BetterStar size={25} favorite={this.props.favorite} />
+            <BetterStar size={25} favorite={this.props.favorite} />
+            <BetterStar size={25} favorite={this.props.favorite} />
+            <BetterStar size={25} favorite={this.props.favorite} />
+            <GreenButton
+              onClick={() =>
+                this.setState({ frontSide: !this.state.frontSide })
+              }
+            >
+              <ButtonText>Schedule</ButtonText>
+            </GreenButton>
           </Menu>
           <p>{this.props.tutor.sessions + " sessions"}</p>
         </Box>
-        
       );
-      }
+    }
   }
 }
 
