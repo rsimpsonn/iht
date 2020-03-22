@@ -12,9 +12,10 @@ const getUniversity = async id => {
 
   const uniRef = firebase.db.collection("universities").doc(id);
   const university = await uniRef.get();
-  loadedUniversities[id] = university.data();
+  loadedUniversities[id] = { id, ...university.data() };
 
-  return university.data();
+  return { id, ...university.data() };
+
 };
 
 export default getUniversity;
