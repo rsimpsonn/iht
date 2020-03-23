@@ -152,37 +152,43 @@ class UpcomingSession extends Component {
             {this.state.w.profilePic && (
               <Circle src={this.state.w.profilePic} />
             )}
-            <Popup
-              trigger={<AiOutlineSetting color="#5a5a5a" size={14} />}
-              position="bottom center"
-              flowing
-              hoverable
-              onClick={() => this.confirmCancel(startDate.getTime())}
-            >
-              <p>
-                <Cancel>Cancel</Cancel>
-              </p>
-            </Popup>
+            {!this.state.open && (
+              <Popup
+                trigger={<AiOutlineSetting color="#5a5a5a" size={14} />}
+                position="bottom center"
+                flowing
+                hoverable
+                onClick={() => this.confirmCancel(startDate.getTime())}
+              >
+                <p>
+                  <Cancel>Cancel</Cancel>
+                </p>
+              </Popup>
+            )}
           </Bar>
         </Menu>
         <Divider />
-        <Tiny margin>
-          <AiOutlineCalendar size={14} /> {days[startDate.getDay()]}{" "}
-          {startDate.getMonth() + 1}/{startDate.getDate()}
-          &nbsp;&nbsp;&nbsp;&nbsp;
-          <AiOutlineClockCircle size={14} />{" "}
-          {startDate.getHours() % 12 == 0 ? 12 : startDate.getHours() % 12}
-          {startDate.getHours() > 11 ? "PM" : "AM"} -{" "}
-          {endDate.getHours() % 12 == 0 ? 12 : endDate.getHours() % 12}
-          {endDate.getHours() > 11 ? "PM" : "AM"}
-        </Tiny>
+        {!this.state.open && (
+          <Tiny margin>
+            <AiOutlineCalendar size={14} /> {days[startDate.getDay()]}{" "}
+            {startDate.getMonth() + 1}/{startDate.getDate()}
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <AiOutlineClockCircle size={14} />{" "}
+            {startDate.getHours() % 12 == 0 ? 12 : startDate.getHours() % 12}
+            {startDate.getHours() > 11 ? "PM" : "AM"} -{" "}
+            {endDate.getHours() % 12 == 0 ? 12 : endDate.getHours() % 12}
+            {endDate.getHours() > 11 ? "PM" : "AM"}
+          </Tiny>
+        )}
         {this.state.open && (
           <EnterSession
             onClick={() =>
               this.props.history.push("/sessions?s=" + this.props.session.id)
             }
           >
-            <EnterSessionText>Enter Session</EnterSessionText>
+            <Tiny style={{ color: "white", fontWeight: "Bold" }}>
+              Enter Session
+            </Tiny>
           </EnterSession>
         )}
       </Box>
@@ -207,7 +213,7 @@ const Box = styled.div`
   ${props =>
     props.glow &&
     `
-    box-shadow: 0 0 20px #CBF2E9;
+    box-shadow: 0 0 20px #9FF1DD;
     `}
 `;
 
@@ -220,12 +226,12 @@ const Cancel = styled.p`
 const EnterSession = styled.div`
   background-color: #09aa82;
   border-radius: 20px;
-  padding: 10px;
+  padding: 8px 10px;
   cursor: pointer;
-
-  &:hover {
-    transform: scale(1.1);
-  }
+  display: flex;
+  justify-content: center;
+  width: 60%;
+  margin: auto;
 `;
 
 const EnterSessionText = styled.p`

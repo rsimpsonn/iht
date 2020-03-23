@@ -68,6 +68,7 @@ const AlertBar = styled.div`
 
 const TopMargin = styled.div`
   margin: 20px 0 0 0;
+  padding: 0 2%;
 `;
 
 export default withRouter(Dashboard);

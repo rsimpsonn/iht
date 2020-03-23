@@ -117,33 +117,27 @@ function App() {
     <userContext.Provider value={{ user, isTutor }}>
       <alertContext.Provider value={{ newAlert, setNewAlert }}>
         <userDetailsContext.Provider value={{ userDetails, setUserDetails }}>
-          <Padding>
-            <Router>
-              <Toolbar />
-              <Switch>
-                <Route path="/availability">
-                  <Availability />
-                </Route>
-                <Route path="/dashboard">
-                  <Dashboard />
-                </Route>
-                <Route path="/signin">
-                  <SignIn />
-                </Route>
-                <Route path="/">
-                  <Landing />
-                </Route>
-              </Switch>
-            </Router>
-          </Padding>
+          <Router>
+            <Toolbar />
+            <Switch>
+              <Route path="/availability">
+                <Availability />
+              </Route>
+              <Route path="/dashboard">
+                <Dashboard />
+              </Route>
+              <Route path="/signin">
+                <SignIn />
+              </Route>
+              <Route path="/">
+                <Landing />
+              </Route>
+            </Switch>
+          </Router>
         </userDetailsContext.Provider>
       </alertContext.Provider>
     </userContext.Provider>
   );
 }
-
-const Padding = styled.div`
-  padding: 2%;
-`;
 
 export default App;

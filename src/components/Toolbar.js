@@ -87,6 +87,7 @@ const Menu = styled.div`
   width: 100%;
   justify-content: space-between;
   align-items: center;
+  padding: 2% 2% 0;
 `;
 
 const Header = styled.p`
