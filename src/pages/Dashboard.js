@@ -7,13 +7,36 @@ import alertContext from "../contexts/alertContext";
 import TutorDashboard from "./TutorDashboard";
 import ClientDashboard from "./ClientDashboard";
 
-function Dashboard() {
+import { withRouter } from "react-router-dom";
+
+function Dashboard(props) {
   return (
     <userContext.Consumer>
       {userContext => (
         <div>
-          {userContext.isTutor && <TutorDashboard />}
-          {userContext.user && !userContext.isTutor && <ClientDashboard />}
+          <alertContext.Consumer>
+            {alertContext =>
+              alertContext.newAlert.banner && (
+                <AlertBar>
+                  <AlertText>{alertContext.newAlert.message}</AlertText>
+                  {alertContext.newAlert.actionType === "link" && (
+                    <AlertText
+                      link
+                      onClick={() =>
+                        props.history.push(alertContext.newAlert.url)
+                      }
+                    >
+                      {alertContext.newAlert.actionText}
+                    </AlertText>
+                  )}
+                </AlertBar>
+              )
+            }
+          </alertContext.Consumer>
+          <div>
+            {userContext.isTutor && <TutorDashboard />}
+            {userContext.user && !userContext.isTutor && <ClientDashboard />}
+          </div>
         </div>
       )}
     </userContext.Consumer>
@@ -24,12 +47,23 @@ const AlertText = styled.div`
   font-size: 14px;
   color: white;
   font-family: Lato;
+
+  margin: 0 10px 0 0;
+  ${props =>
+    props.link &&
+    `
+    font-style: italic;
+    cursor: pointer;
+    font-weight: Bold;
+    `};
 `;
 
 const AlertBar = styled.div`
-  padding: 2%;
-  color: #09aa82;
+  padding: 12px 2%;
+  background-color: #09aa82;
   width: 100%;
+  display: flex;
+  flex-direction: row;
 `;
 
-export default Dashboard;
+export default withRouter(Dashboard);

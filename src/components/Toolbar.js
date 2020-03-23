@@ -37,7 +37,7 @@ function Toolbar(props) {
                 <AiOutlineCalendar size={30} />
                 <ListItem bold>Calendar</ListItem>
               </Icon>
-              <Alerts />
+              <Alerts userContext={context} />
               <Icon>
                 <Popup
                   trigger={<Circle />}

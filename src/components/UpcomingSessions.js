@@ -11,14 +11,18 @@ function UpcomingSessions(props) {
     return <div />;
   }
   return (
-    <div>
-      {props.sessions.length > 0 && <Header>Upcoming Sessions</Header>}
-      <Bar>
-        {props.sessions.map(s => (
-          <UpcomingSession session={s} />
-        ))}
-      </Bar>
-    </div>
+    <userContext.Consumer>
+      {userContext => (
+        <div>
+          {props.sessions.length > 0 && <Header>Upcoming Sessions</Header>}
+          <Bar>
+            {props.sessions.map(s => (
+              <UpcomingSession userContext={userContext} session={s} />
+            ))}
+          </Bar>
+        </div>
+      )}
+    </userContext.Consumer>
   );
 }
 
