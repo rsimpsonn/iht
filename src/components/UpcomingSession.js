@@ -7,17 +7,20 @@ import getSubject from "../subjects";
 
 import alertContext from "../contexts/alertContext";
 
-import { AiOutlineSetting } from "react-icons/ai";
+import {
+  AiOutlineSetting,
+  AiOutlineCalendar,
+  AiOutlineClockCircle
+} from "react-icons/ai";
 import getEduLevel from "../educationLevels";
-import { Popup } from "semantic-ui-react";
+import { Popup, Divider } from "semantic-ui-react";
 import { withRouter } from "react-router-dom";
+import { SubHeader, Small, Tiny } from "../styles";
 
 class UpcomingSession extends Component {
   state = {
     subject: "",
-    w: {
-      firstName: ""
-    },
+    w: {},
     level: "",
     meetingWith: "",
     open: false
@@ -137,37 +140,20 @@ class UpcomingSession extends Component {
     const startDate = this.props.session.start.toDate();
     const endDate = this.props.session.end.toDate();
 
-    const days = [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday"
-    ];
-    const months = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December"
-    ];
-
+    const days = ["Sun", "Mon", "Tues", "Wed", "Thurs", "Fri", "Sat"];
     return (
       <Box glow={this.state.open}>
         <Menu>
-          {this.state.subject.title}
+          <div>
+            <SubHeader>{this.state.subject.title}</SubHeader>
+            <Small>With {this.state.w.firstName}</Small>
+          </div>
           <Bar>
+            {this.state.w.profilePic && (
+              <Circle src={this.state.w.profilePic} />
+            )}
             <Popup
-              trigger={<AiOutlineSetting color="#D8D8D8" size="20px" />}
+              trigger={<AiOutlineSetting color="#5a5a5a" size={14} />}
               position="bottom center"
               flowing
               hoverable
@@ -179,17 +165,17 @@ class UpcomingSession extends Component {
             </Popup>
           </Bar>
         </Menu>
-        <p>{this.state.level.title}</p>
-        <p>
-          {days[startDate.getDay()]}, {months[startDate.getMonth()]}{" "}
-          {startDate.getDate()}
-        </p>
-        <p>
-          {startDate.getHours() % 12 == 0 ? 12 : startDate.getHours() % 12}:
-          {startDate.getMinutes()} -{" "}
-          {endDate.getHours() % 12 == 0 ? 12 : endDate.getHours() % 12}:
-          {endDate.getMinutes()}
-        </p>
+        <Divider />
+        <Tiny margin>
+          <AiOutlineCalendar size={14} /> {days[startDate.getDay()]}{" "}
+          {startDate.getMonth() + 1}/{startDate.getDate()}
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          <AiOutlineClockCircle size={14} />{" "}
+          {startDate.getHours() % 12 == 0 ? 12 : startDate.getHours() % 12}
+          {startDate.getHours() > 11 ? "PM" : "AM"} -{" "}
+          {endDate.getHours() % 12 == 0 ? 12 : endDate.getHours() % 12}
+          {endDate.getHours() > 11 ? "PM" : "AM"}
+        </Tiny>
         {this.state.open && (
           <EnterSession
             onClick={() =>
@@ -199,14 +185,6 @@ class UpcomingSession extends Component {
             <EnterSessionText>Enter Session</EnterSessionText>
           </EnterSession>
         )}
-        {this.state.w && (
-          <p>
-            With {this.state.w.firstName}{" "}
-            {this.state.w.profilePic && (
-              <Circle src={this.state.w.profilePic} />
-            )}
-          </p>
-        )}
       </Box>
     );
   }
@@ -214,19 +192,22 @@ class UpcomingSession extends Component {
 
 const Circle = styled.img`
   border-radius: 50%;
-  width: 25px;
-  height: 25px;
+  width: 30px;
+  height: 30px;
+  margin: 0 10px;
 `;
 
 const Box = styled.div`
-  box-shadow: 0 0 20px #f6f6f6;
+  box-shadow: 0 0 20px #e9e9e9;
+  border-radius: 8px;
+  margin: 0 15px;
   padding: 15px;
-  width: 15%;
+  width: 17.5%;
 
   ${props =>
     props.glow &&
     `
-    box-shadow: 0 0 20px #CDEEE6;
+    box-shadow: 0 0 20px #CBF2E9;
     `}
 `;
 

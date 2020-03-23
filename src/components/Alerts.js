@@ -55,12 +55,11 @@ class Alerts extends Component {
                 <CircleText>{unread}</CircleText>
               </Circle>
             )}
-            <AiOutlineBell size={30} />
+            <AiOutlineBell style={{ margin: 5 }} size={25} />
             <ListItem bold>Alerts</ListItem>
           </Icon>
         }
-        flowing
-        hoverable
+        on="click"
         position="bottom center"
       >
         <List>

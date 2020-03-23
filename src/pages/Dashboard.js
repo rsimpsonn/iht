@@ -33,10 +33,10 @@ function Dashboard(props) {
               )
             }
           </alertContext.Consumer>
-          <div>
+          <TopMargin>
             {userContext.isTutor && <TutorDashboard />}
             {userContext.user && !userContext.isTutor && <ClientDashboard />}
-          </div>
+          </TopMargin>
         </div>
       )}
     </userContext.Consumer>
@@ -64,6 +64,10 @@ const AlertBar = styled.div`
   width: 100%;
   display: flex;
   flex-direction: row;
+`;
+
+const TopMargin = styled.div`
+  margin: 20px 0 0 0;
 `;
 
 export default withRouter(Dashboard);

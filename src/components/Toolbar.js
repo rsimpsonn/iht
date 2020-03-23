@@ -1,12 +1,16 @@
-import React from "react";
+import React, { Component } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import userContext from "../contexts/userContext";
+import userDetailsContext from "../contexts/userDetailsContext";
 import { Popup } from "semantic-ui-react";
+
 import getTutor from "../tutors.js";
 import firebase from "../firebase";
+
 import { withRouter } from "react-router-dom";
 import Alerts from "./Alerts";
+import User from "./User";
 
 import {
   AiOutlineBell,
@@ -30,17 +34,19 @@ function Toolbar(props) {
           {context.user != null && (
             <Bar>
               <Icon onClick={() => props.history.push("/dashboard")}>
-                <AiOutlineHome size={30} />
+                <AiOutlineHome style={{ margin: 5 }} size={25} />
                 <ListItem bold>Dashboard</ListItem>
               </Icon>
               <Icon onClick={() => props.history.push("/calendar")}>
-                <AiOutlineCalendar size={30} />
+                <AiOutlineCalendar style={{ margin: 5 }} size={25} />
                 <ListItem bold>Calendar</ListItem>
               </Icon>
               <Alerts userContext={context} />
               <Icon>
                 <Popup
-                  trigger={<Circle />}
+                  trigger={
+                    <User isTutor={context.isTutor} id={context.user.uid} />
+                  }
                   position="bottom right"
                   flowing
                   hoverable
@@ -81,7 +87,6 @@ const Menu = styled.div`
   width: 100%;
   justify-content: space-between;
   align-items: center;
-  padding: 2%;
 `;
 
 const Header = styled.p`

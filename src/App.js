@@ -1,4 +1,6 @@
 import React from "react";
+import styled from "styled-components";
+
 import logo from "./logo.svg";
 import {
   BrowserRouter as Router,
@@ -18,6 +20,7 @@ import Toolbar from "./components/Toolbar";
 import firebase from "./firebase";
 import userContext from "./contexts/userContext";
 import alertContext from "./contexts/alertContext";
+import userDetailsContext from "./contexts/userDetailsContext";
 
 function App() {
   const useAuth = () => {
@@ -86,6 +89,26 @@ function App() {
 
   const { newAlert, setNewAlert } = useAlerts();
 
+  const useDetails = () => {
+    const [state, setState] = React.useState(() => {
+      const setUserDetails = userDetails => {
+        setState({
+          userDetails,
+          setUserDetails
+        });
+      };
+
+      return {
+        userDetails: {},
+        setUserDetails
+      };
+    });
+
+    return state;
+  };
+
+  const { userDetails, setUserDetails } = useDetails();
+
   if (initializing) {
     return <div>Loading</div>;
   }
@@ -93,26 +116,34 @@ function App() {
   return (
     <userContext.Provider value={{ user, isTutor }}>
       <alertContext.Provider value={{ newAlert, setNewAlert }}>
-        <Router>
-          <Toolbar />
-          <Switch>
-            <Route path="/availability">
-              <Availability />
-            </Route>
-            <Route path="/dashboard">
-              <Dashboard />
-            </Route>
-            <Route path="/signin">
-              <SignIn />
-            </Route>
-            <Route path="/">
-              <Landing />
-            </Route>
-          </Switch>
-        </Router>
+        <userDetailsContext.Provider value={{ userDetails, setUserDetails }}>
+          <Padding>
+            <Router>
+              <Toolbar />
+              <Switch>
+                <Route path="/availability">
+                  <Availability />
+                </Route>
+                <Route path="/dashboard">
+                  <Dashboard />
+                </Route>
+                <Route path="/signin">
+                  <SignIn />
+                </Route>
+                <Route path="/">
+                  <Landing />
+                </Route>
+              </Switch>
+            </Router>
+          </Padding>
+        </userDetailsContext.Provider>
       </alertContext.Provider>
     </userContext.Provider>
   );
 }
+
+const Padding = styled.div`
+  padding: 2%;
+`;
 
 export default App;

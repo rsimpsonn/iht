@@ -7,16 +7,23 @@ import * as fb from "firebase";
 import userContext from "../contexts/userContext";
 import getSubject from "../subjects";
 import getEduLevel from "../educationLevels";
-import { Popup } from "semantic-ui-react";
-import { AiOutlineSetting } from "react-icons/ai";
+import { Popup, Divider } from "semantic-ui-react";
+import { SubHeader, Small, Tiny } from "../styles";
 
-import { AiFillCheckCircle, AiFillCloseCircle } from "react-icons/ai";
+import {
+  AiFillCheckCircle,
+  AiFillCloseCircle,
+  AiOutlineCalendar,
+  AiOutlineUser,
+  AiOutlineClockCircle,
+  AiOutlineSetting
+} from "react-icons/ai";
 
 class RequestedSession extends Component {
   state = {
     subject: "",
-    meetingWith: "",
-    level: "",
+    meetingWith: {},
+    level: ""
   };
 
   static contextType = userContext;
@@ -33,9 +40,9 @@ class RequestedSession extends Component {
     const meetingWith = await withRef.get();
 
     let eduLevel = false;
-    if (context.isTutor) {
-      eduLevel = await getEduLevel(meetingWith.data().educationID);
-    }
+    if (context.isTutor) {
+      eduLevel = await getEduLevel(meetingWith.data().educationID);
+    }
 
     this.setState({
       subject: subject,
@@ -84,126 +91,96 @@ class RequestedSession extends Component {
     }
   }
 
-
   render() {
     const startDate = this.props.session.start.toDate();
     const endDate = this.props.session.end.toDate();
 
-    const days = [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday"
-    ];
+    const days = ["Sun", "Mon", "Tues", "Wed", "Thurs", "Fri", "Sat"];
 
-    const months = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December"
-    ];
-    if(this.context.isTutor){
-    return (
-      <Box>
-        <Menu>{this.state.subject.title}</Menu>
-        <p>{this.state.level.title}</p>
-        <p>
-          {days[startDate.getDay()]}, {months[startDate.getMonth()]}{" "}
-          {startDate.getDate()}
-        </p>
-        <p>
-          {startDate.getHours() % 12 == 0 ? 12 : startDate.getHours() % 12}:
-          {startDate.getMinutes()} -{" "}
-          {endDate.getHours() % 12 == 0 ? 12 : endDate.getHours() % 12}:
-          {endDate.getMinutes()}
-        </p>
-        <Menu> 
-          <Row>
-            <BetterCheck
-              color="#09AA82"
-              size={30}
-              cursor="pointer"
-              onClick={() => this.confirmAccept()}
-            />
-            <BetterX
-              color="#ff8989"
-              size={30}
-              cursor="pointer"
-              onClick={() => this.confirmDecline()}
-            />
-          </Row>
-          <Bar>
-            {this.state.meetingWith && (
-              <p>
-                With {this.state.meetingWith.firstName}{" "}
-                {this.state.meetingWith.profilePic && (
-                  <Circle src={this.state.meetingWith.profilePic} />
-                )}
-              </p>
-            )}
-          </Bar>
-        </Menu>
-      </Box>
-    );
-  } else{
-    return(
-    <Box>
-        <Menu>
-        {this.state.subject.title}
-        <Bar>
-            <Popup
-              trigger={<AiOutlineSetting color="#D8D8D8" size="20px" />}
-              position="bottom center"
-              flowing
-              hoverable
-              onClick={() => this.confirmCancel()}
-            >
-              <p>
-                <Cancel>Cancel</Cancel>
-              </p>
-            </Popup>
-          </Bar>
-        </Menu>
-        <p>{this.state.level.title}</p>
-        <p>
-          {days[startDate.getDay()]}, {months[startDate.getMonth()]}{" "}
-          {startDate.getDate()}
-        </p>
-        <p>
-          {startDate.getHours() % 12 == 0 ? 12 : startDate.getHours() % 12}:
-          {startDate.getMinutes()} -{" "}
-          {endDate.getHours() % 12 == 0 ? 12 : endDate.getHours() % 12}:
-          {endDate.getMinutes()}
-        </p>
-        <Menu> 
-          <Bar>
-            {this.state.meetingWith && (
-              <p>
-                With {this.state.meetingWith.firstName}{" "}
-                {this.state.meetingWith.profilePic && (
-                  <Circle src={this.state.meetingWith.profilePic} />
-                )}
-              </p>
-            )}
-          </Bar>
-        </Menu>
-      </Box>
-    );
+    if (this.context.isTutor) {
+      return (
+        <Box>
+          <Menu>
+            <div>
+              <SubHeader>{this.state.subject.title}</SubHeader>
+              <Small>{this.state.level.title}</Small>
+            </div>
+            <Row>
+              <BetterCheck
+                color="#09AA82"
+                size={30}
+                cursor="pointer"
+                onClick={() => this.confirmAccept()}
+              />
+              <BetterX
+                color="#ff8989"
+                size={30}
+                cursor="pointer"
+                onClick={() => this.confirmDecline()}
+              />
+            </Row>
+          </Menu>
+          <Divider />
+          <Tiny margin>
+            <AiOutlineCalendar size={14} /> {days[startDate.getDay()]}{" "}
+            {startDate.getMonth() + 1}/{startDate.getDate()}
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <AiOutlineClockCircle size={14} />{" "}
+            {startDate.getHours() % 12 == 0 ? 12 : startDate.getHours() % 12}
+            {startDate.getHours() > 11 ? "PM" : "AM"} -{" "}
+            {endDate.getHours() % 12 == 0 ? 12 : endDate.getHours() % 12}
+            {endDate.getHours() > 11 ? "PM" : "AM"}
+          </Tiny>
+          {this.state.meetingWith && (
+            <Tiny>
+              <AiOutlineUser size={14} /> With{" "}
+              {this.state.meetingWith.firstName}{" "}
+              {this.state.meetingWith.profilePic && (
+                <Circle src={this.state.meetingWith.profilePic} />
+              )}
+            </Tiny>
+          )}
+        </Box>
+      );
+    } else {
+      return (
+        <Box>
+          <Menu>
+            <div>
+              <SubHeader>{this.state.subject.title}</SubHeader>
+              <Small>With {this.state.meetingWith.firstName}</Small>
+            </div>
+            <Row>
+              <Circle src={this.state.meetingWith.profilePic} />
+            </Row>
+          </Menu>
+          <Divider />
+          <Tiny margin>
+            <AiOutlineCalendar size={14} /> {days[startDate.getDay()]}{" "}
+            {startDate.getMonth() + 1}/{startDate.getDate()}
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <AiOutlineClockCircle size={14} />{" "}
+            {startDate.getHours() % 12 == 0 ? 12 : startDate.getHours() % 12}
+            {startDate.getHours() > 11 ? "PM" : "AM"} -{" "}
+            {endDate.getHours() % 12 == 0 ? 12 : endDate.getHours() % 12}
+            {endDate.getHours() > 11 ? "PM" : "AM"}
+          </Tiny>
+          <Popup
+            trigger={<AiOutlineSetting color="#5a5a5a" size={14} />}
+            position="bottom center"
+            flowing
+            hoverable
+            onClick={() => this.confirmCancel()}
+          >
+            <Bar>
+              <Cancel>Cancel</Cancel>
+            </Bar>
+          </Popup>
+        </Box>
+      );
+    }
   }
 }
-}
-
 
 const BetterCheck = styled(AiFillCheckCircle)`
   &:hover {
@@ -219,14 +196,16 @@ const BetterX = styled(AiFillCloseCircle)`
 
 const Circle = styled.img`
   border-radius: 50%;
-  width: 25px;
-  height: 25px;
+  width: 30px;
+  height: 30px;
 `;
 
 const Box = styled.div`
-  box-shadow: 0 0 20px #f6f6f6;
+  box-shadow: 0 0 20px #e9e9e9;
+  border-radius: 8px;
+  margin: 0 15px;
   padding: 15px;
-  width: 15%;
+  width: 17.5%;
 `;
 
 const Bar = styled.div`
@@ -240,6 +219,7 @@ const Menu = styled.div`
   flex-direction: row;
   width: 100%;
   justify-content: space-between;
+  align-items: center;
 `;
 
 const Row = styled.div`

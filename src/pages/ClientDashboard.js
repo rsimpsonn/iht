@@ -6,6 +6,7 @@ import styled from "styled-components";
 import firebase from "../firebase";
 
 import userContext from "../contexts/userContext";
+import { Divider } from "semantic-ui-react";
 
 import UpcomingSessions from "../components/UpcomingSessions";
 import ScheduleSessions from "../components/ScheduleSessions";
@@ -70,10 +71,13 @@ class ClientDashboard extends Component {
         <UpcomingSessions
           sessions={this.state.sessions.filter(s => s.status === "Upcoming")}
         />
+        <Divider />
         <ScheduleSessions client={this.state.client} />
+        <Divider />
         <RequestedSessions
           sessions={this.state.sessions.filter(s => s.status === "Requested")}
         />
+        <Divider />
         <PastSessions
           sessions={this.state.sessions.filter(
             s =>

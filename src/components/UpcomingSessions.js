@@ -4,6 +4,8 @@ import styled from "styled-components";
 import firebase from "../firebase";
 import userContext from "../contexts/userContext";
 
+import { Header } from "../styles";
+
 import UpcomingSession from "./UpcomingSession";
 
 function UpcomingSessions(props) {
@@ -13,29 +15,27 @@ function UpcomingSessions(props) {
   return (
     <userContext.Consumer>
       {userContext => (
-        <div>
+        <TopMargin>
           {props.sessions.length > 0 && <Header>Upcoming Sessions</Header>}
           <Bar>
             {props.sessions.map(s => (
               <UpcomingSession userContext={userContext} session={s} />
             ))}
           </Bar>
-        </div>
+        </TopMargin>
       )}
     </userContext.Consumer>
   );
 }
 
-const Header = styled.p`
-  font-size: 20px;
-  font-family: Lato;
-  font-weight: Bold;
-`;
-
 const Bar = styled.div`
   display: flex;
   padding: 2%;
   flex-direction: row;
+`;
+
+const TopMargin = styled.div`
+  padding: 20px 0 20px;
 `;
 
 export default UpcomingSessions;

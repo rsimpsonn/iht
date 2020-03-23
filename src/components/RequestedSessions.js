@@ -6,32 +6,32 @@ import userContext from "../contexts/userContext";
 
 import RequestedSession from "./RequestedSession";
 
+import { Header } from "../styles";
+
 function RequestedSessions(props) {
   if (!props.sessions) {
     return <div />;
   }
   return (
-    <div>
+    <TopMargin>
       {props.sessions.length > 0 && <Header>Requested Sessions</Header>}
       <Bar>
         {props.sessions.map(s => (
           <RequestedSession session={s} />
         ))}
       </Bar>
-    </div>
+    </TopMargin>
   );
 }
-
-const Header = styled.p`
-  font-size: 20px;
-  font-family: Lato;
-  font-weight: Bold;
-`;
 
 const Bar = styled.div`
   display: flex;
   padding: 2%;
   flex-direction: row;
+`;
+
+const TopMargin = styled.div`
+  padding: 20px 0 20px;
 `;
 
 export default RequestedSessions;
