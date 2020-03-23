@@ -6,25 +6,37 @@ import Alert from "./Alert";
 
 import firebase from "../firebase";
 
-import userContext from "../contexts/userContext";
+import alertContext from "../contexts/alertContext";
 
 class Alerts extends Component {
   state = {
     alerts: []
   };
 
-  static contextType = userContext;
+  static contextType = alertContext;
 
   componentDidMount() {
     let earliest = new Date();
     earliest.setDate(earliest.getDate() - 7);
     firebase.db
       .collection("alerts")
-      .where("to", "==", this.context.user.uid)
+      .where("to", "==", this.props.userContext.user.uid)
       .where("time", ">", earliest)
       .onSnapshot(querySnapshot =>
         this.setState({
           alerts: querySnapshot.docs.map(d => {
+            if (d.banner) {
+              const now = new Date();
+              const until = d.until.toDate();
+
+              if (until.getTime() > now.getTime()) {
+                this.context.setNewAlert({
+                  ...d.data(),
+                  id: d.id,
+                  time: d.data().time.toDate()
+                });
+              }
+            }
             return { ...d.data(), id: d.id, time: d.data().time.toDate() };
           })
         })
@@ -32,6 +44,7 @@ class Alerts extends Component {
   }
 
   render() {
+    console.log(this.context);
     const unread = this.state.alerts.filter(a => !a.read).length;
     return (
       <Popup
@@ -42,12 +55,11 @@ class Alerts extends Component {
                 <CircleText>{unread}</CircleText>
               </Circle>
             )}
-            <AiOutlineBell size={30} />
+            <AiOutlineBell style={{ margin: 5 }} size={25} />
             <ListItem bold>Alerts</ListItem>
           </Icon>
         }
-        flowing
-        hoverable
+        on="click"
         position="bottom center"
       >
         <List>

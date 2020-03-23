@@ -1,7 +1,8 @@
 import React from "react";
 
 const alertContext = React.createContext({
-  alerts: []
+  newAlert: {},
+  setNewAlert: alert => {}
 });
 
 export default alertContext;

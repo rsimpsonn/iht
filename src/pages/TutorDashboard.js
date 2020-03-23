@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import { Divider } from "semantic-ui-react";
 
 import firebase from "../firebase";
 import userContext from "../contexts/userContext";
@@ -55,9 +56,11 @@ class TutorDashboard extends Component {
         <UpcomingSessions
           sessions={this.state.sessions.filter(s => s.status === "Upcoming")}
         />
+        <Divider />
         <RequestedSessions
           sessions={this.state.sessions.filter(s => s.status === "Requested")}
         />
+        <Divider />
         <PastSessions
           sessions={this.state.sessions.filter(
             s =>

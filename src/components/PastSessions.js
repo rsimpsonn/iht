@@ -4,6 +4,8 @@ import styled from "styled-components";
 import firebase from "../firebase";
 import userContext from "../contexts/userContext";
 
+import { Header } from "../styles";
+
 import PastSession from "./PastSession";
 
 function PastSessions(props) {
@@ -21,12 +23,6 @@ function PastSessions(props) {
     </div>
   );
 }
-
-const Header = styled.p`
-  font-size: 20px;
-  font-family: Lato;
-  font-weight: Bold;
-`;
 
 const Bar = styled.div`
   display: flex;
