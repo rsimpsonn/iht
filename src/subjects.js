@@ -17,4 +17,20 @@ const getSubject = async id => {
   return { id, ...subject.data() };
 };
 
+export const getAllSubjects = async () => {
+  const allRef = firebase.db.collection("subjects");
+  const snapshot = await allRef.get();
+  let all = [];
+  snapshot.docs.forEach(doc => {
+    const subject = {
+      id: doc.id,
+      ...doc.data()
+    };
+    all.push(subject);
+    loadedSubjects[doc.id] = subject;
+  });
+
+  return all;
+};
+
 export default getSubject;

@@ -5,6 +5,8 @@ import firebase from "../firebase";
 import * as fb from "firebase";
 import getSubject from "../subjects";
 
+import axios from "axios";
+
 import alertContext from "../contexts/alertContext";
 
 import {
@@ -18,6 +20,11 @@ import { withRouter } from "react-router-dom";
 import { SubHeader, Small, Tiny } from "../styles";
 
 class UpcomingSession extends Component {
+  constructor(props) {
+    super(props);
+
+    this.addToCalendar = this.addToCalendar.bind(this);
+  }
   state = {
     subject: "",
     w: {},
@@ -104,6 +111,22 @@ class UpcomingSession extends Component {
       w: w.data(),
       level: eduLevel
     });
+  }
+
+  addToCalendar() {
+    axios
+      .post(
+        "https://www.googleapis.com/calendar/v3/calendars/" +
+          this.props.userContext.user.email +
+          "/events",
+        {
+          summary: "Tutoring session with " + this.state.w.firstName,
+          start: this.props.session.start,
+          end: this.props.session.end
+        }
+      )
+      .then(() => console.log("success"))
+      .catch(e => console.log(e));
   }
 
   respondToCancel(time) {

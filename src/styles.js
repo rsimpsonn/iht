@@ -5,6 +5,12 @@ export const Header = styled.p`
   font-family: Lato;
   font-weight: Bold;
   margin: 20px 0 0;
+
+  ${props =>
+    props.margin &&
+    `
+  margin: 20px 20px 20px 0;
+  `}
 `;
 
 export const SubHeader = styled.p`
@@ -44,4 +50,67 @@ export const Tiny = styled.p`
     `
   margin: 10px 10px 10px 0;
   `}
+`;
+
+export const SmallButton = styled.div`
+  background-color: #09aa82;
+  border-radius: 20px;
+  padding: 8px 10px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  width: 60%;
+  margin: auto;
+
+  ${props =>
+    props.color &&
+    `
+    background-color: ${props.color}`}
+`;
+
+export const ButtonText = styled.p`
+  font-family: Lato;
+  font-weight: Bold;
+  color: white;
+  font-size: 15px;
+`;
+
+export const NiceInput = styled.input`
+  border-radius: 4px;
+  background-color: #e9e9e9;
+  padding: 5px 10px;
+  font-size: 16px;
+  width: 100px;
+  border: none;
+  font-family: Lato;
+  font-weight: Bold;
+  &:focus {
+    outline: none;
+  }
+
+  ${props =>
+    props.long &&
+    `
+    width: 120px;
+    `}
+`;
+
+export const NiceArea = styled.textarea`
+  border-radius: 4px;
+  background-color: #e9e9e9;
+  padding: 5px 10px;
+  font-size: 16px;
+  border: none;
+  font-family: Lato;
+  font-weight: Bold;
+  resize: none;
+  &:focus {
+    outline: none;
+  }
+
+  ${props =>
+    props.long &&
+    `
+    width: 120px;
+    `}
 `;
