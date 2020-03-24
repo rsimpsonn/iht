@@ -159,8 +159,11 @@ class ScheduleSession extends Component {
             </Popup>
             <TextArea
               onChange={e => this.setState({ additionalInfo: e.target.value })}
+              fluid
+              flowing
               placeholder="Additional information"
               rows={2}
+              cols ={10}
             />
             <GreenButton onClick={this.requestSession}>
               <ButtonText>Request Session</ButtonText>
@@ -176,11 +179,13 @@ class ScheduleSession extends Component {
             <p>{this.props.tutor.bio}</p>
 
             <Menu>
+              
               <BetterStar size={25} favorite={this.props.favorite} />
               <BetterStar size={25} favorite={this.props.favorite} />
               <BetterStar size={25} favorite={this.props.favorite} />
               <BetterStar size={25} favorite={this.props.favorite} />
-              <BetterStar size={25} favorite={this.props.favorite} />
+              <BetterStar size= {25} favorite={this.props.favorite} />
+              
               <GreenButton
                 onClick={() =>
                   this.setState({ frontSide: !this.state.frontSide })
@@ -239,7 +244,7 @@ const Bar = styled.div`
 `;
 
 const GreenButton = styled.div`
-  border-radius: 20px;
+  border-radius: 15px;
   background-color: #09aa82;
   padding: 10px;
   display: flex;

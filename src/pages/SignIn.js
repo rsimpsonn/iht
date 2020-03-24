@@ -14,6 +14,7 @@ class SignIn extends Component {
     firebase.auth.signInWithEmailAndPassword(email, password)
     .catch((error) => {
       console.log(error);
+      window.alert("wrong username or password")
     });
   }
 
@@ -23,6 +24,7 @@ class SignIn extends Component {
           <input name="email" onChange={(e) => this.setState({email: e.target.value})} />
           <input name="password" type="password" onChange={(e) => this.setState({password: e.target.value})} />
           <div onClick={() => this.signIn(this.state.email, this.state.password)}>Submit</div>
+          
       </div>
     )
   }
