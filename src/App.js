@@ -14,6 +14,8 @@ import Landing from "./pages/Landing";
 import SignIn from "./pages/SignIn";
 import Dashboard from "./pages/Dashboard";
 import Availability from "./pages/Availability";
+import Session from "./pages/Session";
+import Settings from "./pages/Settings";
 
 import Toolbar from "./components/Toolbar";
 
@@ -120,6 +122,12 @@ function App() {
           <Router>
             <Toolbar />
             <Switch>
+              <Route path="/settings">
+                <Settings />
+              </Route>
+              <Route path="/sessions">
+                <Session />
+              </Route>
               <Route path="/availability">
                 <Availability />
               </Route>

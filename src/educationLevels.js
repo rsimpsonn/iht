@@ -17,4 +17,20 @@ const getEduLevel = async id => {
   return eduLevel.data();
 };
 
+export const getAllEducationLevels = async () => {
+  const allRef = firebase.db.collection("educationLevels");
+  const snapshot = await allRef.get();
+  let all = [];
+  snapshot.docs.forEach(doc => {
+    const eduLevel = {
+      id: doc.id,
+      ...doc.data()
+    };
+    all.push(eduLevel);
+    loadedLevels[doc.id] = eduLevel;
+  });
+
+  return all;
+};
+
 export default getEduLevel;
