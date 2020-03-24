@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import styled from "styled-components";
 import { Dropdown, Divider } from "semantic-ui-react";
 
+import "../customfileinputs.css";
+
 import {
   Header,
   SubHeader,
@@ -29,6 +31,7 @@ class TutorSettings extends Component {
     this.newPreferences = this.newPreferences.bind(this);
     this.updatePreferences = this.updatePreferences.bind(this);
     this.updateProfile = this.updateProfile.bind(this);
+    this.storeProfilePic = this.storeProfilePic.bind(this);
   }
 
   state = {};
@@ -108,12 +111,30 @@ class TutorSettings extends Component {
     });
   }
 
+  async storeProfilePic() {
+    const storageRef = firebase.storage.ref();
+
+    const mainImage = storageRef.child(this.state.profilePicFile.name);
+
+    const data = await mainImage.put(this.state.profilePicFile);
+
+    const url = await mainImage.getDownloadURL();
+
+    return url;
+  }
+
   async updateProfile() {
     let changedDetails = {
       bio: this.state.bio,
       firstName: this.state.firstName,
       lastName: this.state.lastName
     };
+
+    if (this.state.profilePicFile) {
+      const url = await this.storeProfilePic();
+
+      changedDetails.profilePic = url;
+    }
 
     firebase.db
       .collection("tutors")
@@ -181,7 +202,7 @@ class TutorSettings extends Component {
           })
       : [];
 
-    console.log(this.state.highPref);
+    console.log(this.state.profilePicFile);
     return (
       <Row style={{ margin: "0 auto" }}>
         <Main>
@@ -189,9 +210,30 @@ class TutorSettings extends Component {
             <Header margin>User Profile</Header>
             {this.context.userDetails.userDetails ? (
               <Row>
-                <Circle
-                  image={this.context.userDetails.userDetails.profilePic}
-                />
+                {!this.state.editingProfile && (
+                  <Circle
+                    image={this.context.userDetails.userDetails.profilePic}
+                  />
+                )}
+                {this.state.editingProfile && (
+                  <Circle
+                    image={
+                      this.state.profilePicFile
+                        ? URL.createObjectURL(this.state.profilePicFile)
+                        : this.context.userDetails.userDetails.profilePic
+                    }
+                  >
+                    <input
+                      type="file"
+                      accept="image/*"
+                      id="file"
+                      onChange={e =>
+                        this.setState({ profilePicFile: e.target.files[0] })
+                      }
+                    />
+                    <label for="file">+</label>
+                  </Circle>
+                )}
                 <div style={{ margin: 10 }}>
                   <Row>
                     <div style={{ width: 120 }}>
@@ -385,6 +427,9 @@ const Circle = styled.div`
   justify-content: center;
   align-items: center;
   margin: 10px;
+
+  background-position: center;
+  background-repeat: "no-repeat";
 
   ${props =>
     props.image &&

@@ -16,7 +16,8 @@ firebase.analytics();
 
 const fb = {
   auth: firebase.auth(),
-  db: firebase.firestore(app)
+  db: firebase.firestore(app),
+  storage: firebase.storage()
 };
 
 export default fb;
