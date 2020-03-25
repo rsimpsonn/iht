@@ -68,6 +68,14 @@ class ScheduleSession extends Component {
     });
   }
 
+  updateFavorite(action){
+    if(action){
+      this.props.client.favorites.splice(this.props.client.favorites.indexOf(this.props.tutor.id), 1) 
+    }else{
+      this.props.client.favorites.push(this.props.tutor.id)
+    }
+  }
+
   requestSession() {
     if (!this.state.selectedSubject || !this.state.selectedTimeSlot) {
       alert("Please fill out all fields");
@@ -107,10 +115,10 @@ class ScheduleSession extends Component {
           <SubHeader>{this.props.tutor.firstName}</SubHeader>
           <Bar>
             {this.state.favorite && (
-              <BetterStar size={20} onClick={this.setFavorite} />
+              <BetterStar size={20} onClick={this.updateFavorite(true)&&this.setFavorite} />
             )}
             {!this.state.favorite && (
-              <BetterOutlineStar size={20} onClick={this.setFavorite} />
+              <BetterOutlineStar size={20} onClick={this.updateFavorite(false)&&this.setFavorite} />
             )}
             {!this.state.frontSide && (
               <Circle src={this.props.tutor.profilePic} />
@@ -159,8 +167,11 @@ class ScheduleSession extends Component {
             </Popup>
             <TextArea
               onChange={e => this.setState({ additionalInfo: e.target.value })}
+              fluid
+              flowing
               placeholder="Additional information"
               rows={2}
+              cols ={10}
             />
             <GreenButton onClick={this.requestSession}>
               <ButtonText>Request Session</ButtonText>
@@ -176,11 +187,13 @@ class ScheduleSession extends Component {
             <p>{this.props.tutor.bio}</p>
 
             <Menu>
+              
               <BetterStar size={25} favorite={this.props.favorite} />
               <BetterStar size={25} favorite={this.props.favorite} />
               <BetterStar size={25} favorite={this.props.favorite} />
               <BetterStar size={25} favorite={this.props.favorite} />
-              <BetterStar size={25} favorite={this.props.favorite} />
+              <BetterStar size= {25} favorite={this.props.favorite} />
+              
               <GreenButton
                 onClick={() =>
                   this.setState({ frontSide: !this.state.frontSide })
@@ -239,7 +252,7 @@ const Bar = styled.div`
 `;
 
 const GreenButton = styled.div`
-  border-radius: 20px;
+  border-radius: 15px;
   background-color: #09aa82;
   padding: 10px;
   display: flex;

@@ -14,7 +14,9 @@ const getUniversity = async id => {
   const university = await uniRef.get();
   loadedUniversities[id] = { id, ...university.data() };
 
+
   return { id, ...university.data() };
+
 };
 
 export default getUniversity;
