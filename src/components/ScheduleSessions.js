@@ -33,7 +33,7 @@ class ScheduleSessions extends Component {
 
     this.props.client.favorites.forEach(async f => {
       const t = await getTutor(f);
-      favorites.push(t);
+      favorites.push({ favorite: true, ...t });
 
       if (this.props.client.favorites.length === favorites.length) {
         this.setState({
@@ -51,10 +51,24 @@ class ScheduleSessions extends Component {
           <Bar>
             {this.state.favorites.map(f => (
               <ScheduleSession
-                favorite
+                favorite={f.favorite}
                 bio={false}
                 tutor={f}
                 client={this.props.client}
+                toggleFavorite={() =>
+                  this.setState({
+                    favorites: this.state.favorites.map(fv => {
+                      if (fv.id === f.id) {
+                        return {
+                          ...f,
+                          favorite: !f.favorite
+                        };
+                      } else {
+                        return fv;
+                      }
+                    })
+                  })
+                }
               />
             ))}
           </Bar>
@@ -77,6 +91,8 @@ class ScheduleSessions extends Component {
         )
       }
     ];
+
+    console.log(this.state.favorites);
     return (
       <TopMargin>
         <Header>Schedule sessions</Header>
