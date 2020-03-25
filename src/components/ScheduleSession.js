@@ -68,6 +68,14 @@ class ScheduleSession extends Component {
     });
   }
 
+  updateFavorite(action){
+    if(action){
+      this.props.client.favorites.splice(this.props.client.favorites.indexOf(this.props.tutor.id), 1) 
+    }else{
+      this.props.client.favorites.push(this.props.tutor.id)
+    }
+  }
+
   requestSession() {
     if (!this.state.selectedSubject || !this.state.selectedTimeSlot) {
       alert("Please fill out all fields");
@@ -107,10 +115,10 @@ class ScheduleSession extends Component {
           <SubHeader>{this.props.tutor.firstName}</SubHeader>
           <Bar>
             {this.state.favorite && (
-              <BetterStar size={20} onClick={this.setFavorite} />
+              <BetterStar size={20} onClick={this.updateFavorite(true)&&this.setFavorite} />
             )}
             {!this.state.favorite && (
-              <BetterOutlineStar size={20} onClick={this.setFavorite} />
+              <BetterOutlineStar size={20} onClick={this.updateFavorite(false)&&this.setFavorite} />
             )}
             {!this.state.frontSide && (
               <Circle src={this.props.tutor.profilePic} />
