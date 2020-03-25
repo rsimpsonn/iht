@@ -68,13 +68,22 @@ class ScheduleSession extends Component {
     });
   }
 
-  updateFavorite(action){
-    if(action){
-      this.props.client.favorites.splice(this.props.client.favorites.indexOf(this.props.tutor.id), 1) 
-    }else{
-      this.props.client.favorites.push(this.props.tutor.id)
-    }
-  }
+  updateFavorite(action) {
+    let updatedFavorites = this.props.client.favorites;
+    
+    if (action) {
+      updatedFavorites.splice(updatedFavorites.indexOf(this.props.tutor.id), 1);
+        } else {
+          if (!updatedFavorites.includes(this.props.tutor.id)) {
+            updatedFavorites.push(this.props.tutor.id);
+          }
+        }
+    
+     firebase.db
+       .collection("clients")
+       .doc(this.props.client.id)
+       .set({ favorites: updatedFavorites }, { merge: true });
+      }
 
   requestSession() {
     if (!this.state.selectedSubject || !this.state.selectedTimeSlot) {
@@ -115,10 +124,16 @@ class ScheduleSession extends Component {
           <SubHeader>{this.props.tutor.firstName}</SubHeader>
           <Bar>
             {this.state.favorite && (
-              <BetterStar size={20} onClick={this.updateFavorite(true)&&this.setFavorite} />
+              <BetterStar size={20} onClick={() => {
+                                this.updateFavorite(true);
+                                this.setFavorite()
+                              }} />
             )}
             {!this.state.favorite && (
-              <BetterOutlineStar size={20} onClick={this.updateFavorite(false)&&this.setFavorite} />
+              <BetterOutlineStar size={20} onClick={() => {
+                                this.updateFavorite(false);
+                                this.setFavorite()
+                              }} />
             )}
             {!this.state.frontSide && (
               <Circle src={this.props.tutor.profilePic} />
