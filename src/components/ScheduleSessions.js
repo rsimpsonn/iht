@@ -25,7 +25,7 @@ class ScheduleSessions extends Component {
 
   state = {
     favorites: [],
-    recents:[],
+    recents: [],
     favoritesOpen: false,
     recentsOpen: false,
     searchOpen: false
@@ -42,17 +42,28 @@ class ScheduleSessions extends Component {
         this.setState({
           favorites
         });
-
-
       }
     });
 
-    const snapshot = await firebase.db.collection("sessions").where("status", "==", "Completed").get();
+    const snapshot = await firebase.db
+      .collection("sessions")
+      .where("status", "==", "Completed")
+      .where("client", "==", this.props.client.id)
+      .get();
 
-    const recents = snapshot.docs.map(d => d.data());
+    let recents = [];
 
-    this.setState({
-      recents: recents
+    snapshot.docs.forEach(async f => {
+      const t = await getTutor(f.data().tutor);
+      if (recents.filter(c => c.id === t.id).length === 0) {
+        recents.push({
+          favorite:
+            this.props.client.favorites.filter(e => e.id === t.id).length === 1,
+          ...t
+        });
+      }
+
+      this.setState({ recents });
     });
   }
 
@@ -93,17 +104,17 @@ class ScheduleSessions extends Component {
           <Bar>
             {this.state.recents.map(r => (
               <ScheduleSession
-                recent={r.recent}
+                favorite={r.favorite}
                 bio={false}
                 tutor={r}
                 client={this.props.client}
-                toggleRecent={() =>
+                toggleFavorite={() =>
                   this.setState({
-                    recents: this.state.recents.map(re => {
+                    favorites: this.state.favorites.map(re => {
                       if (re.id === r.id) {
                         return {
                           ...r,
-                          recent: !r.recent
+                          favorite: !r.recent
                         };
                       } else {
                         return re;

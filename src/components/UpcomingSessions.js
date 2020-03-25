@@ -12,6 +12,7 @@ function UpcomingSessions(props) {
   if (!props.sessions || props.sessions.length === 0) {
     return <div />;
   }
+
   return (
     <userContext.Consumer>
       {userContext => (
