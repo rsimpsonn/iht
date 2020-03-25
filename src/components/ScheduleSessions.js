@@ -17,12 +17,15 @@ import {
 } from "react-icons/ai";
 
 import { Header, SubHeader, Small } from "../styles";
+import PastSession from "./PastSession";
+import PastSessioms from "./PastSessions";
 
 class ScheduleSessions extends Component {
   static contextType = userContext;
 
   state = {
     favorites: [],
+    recents:[],
     favoritesOpen: false,
     recentsOpen: false,
     searchOpen: false
@@ -39,7 +42,17 @@ class ScheduleSessions extends Component {
         this.setState({
           favorites
         });
+
+
       }
+    });
+
+    const snapshot = await firebase.db.collection("sessions").where("status", "==", "Completed").get();
+
+    const recents = snapshot.docs.map(d => d.data());
+
+    this.setState({
+      recents: recents
     });
   }
 
@@ -78,7 +91,28 @@ class ScheduleSessions extends Component {
         menuItem: "Recent Tutors",
         render: () => (
           <Bar>
-            <SubHeader cursor="pointer">Recent tutors</SubHeader>
+            {this.state.recents.map(r => (
+              <ScheduleSession
+                recent={r.recent}
+                bio={false}
+                tutor={r}
+                client={this.props.client}
+                toggleRecent={() =>
+                  this.setState({
+                    recents: this.state.recents.map(re => {
+                      if (re.id === r.id) {
+                        return {
+                          ...r,
+                          recent: !r.recent
+                        };
+                      } else {
+                        return re;
+                      }
+                    })
+                  })
+                }
+              />
+            ))}
           </Bar>
         )
       },
