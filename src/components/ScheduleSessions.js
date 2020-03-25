@@ -91,8 +91,6 @@ class ScheduleSessions extends Component {
         )
       }
     ];
-
-    console.log(this.state.favorites);
     return (
       <TopMargin>
         <Header>Schedule sessions</Header>

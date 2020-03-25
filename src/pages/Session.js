@@ -3,13 +3,23 @@ import styled from "styled-components";
 import { withRouter } from "react-router-dom";
 import { Loader } from "semantic-ui-react";
 
-import { SubHeader } from "../styles";
-
 import userContext from "../contexts/userContext";
 import firebase from "../firebase";
 import { generateToken } from "../generateToken";
 
+import {
+  SmallButton,
+  ButtonText,
+  Header,
+  SubHeader,
+  Small,
+  Tiny
+} from "../styles";
+
 import Video from "twilio-video";
+
+import Dropzone from "react-dropzone";
+import FileViewer from "react-file-viewer";
 
 class Session extends Component {
   constructor(props) {
@@ -19,6 +29,8 @@ class Session extends Component {
     this.roomJoined = this.roomJoined.bind(this);
     this.leaveRoom = this.leaveRoom.bind(this);
     this.participantConnected = this.participantConnected.bind(this);
+    this.disconnect = this.disconnect.bind(this);
+    this.storeFile = this.storeFile.bind(this);
   }
   static contextType = userContext;
 
@@ -59,6 +71,7 @@ class Session extends Component {
     this.setState({
       sessionId: this.getSessionId(),
       session: sessionData,
+      sharedDocuments: [],
       open,
       loading: false,
       token,
@@ -77,23 +90,31 @@ class Session extends Component {
     const tutorDoc = await tutorRef.get();
     const tutor = tutorDoc.data();
 
+    firebase.db
+      .collection("sessions")
+      .doc(sessionId)
+      .collection("sharedDocuments")
+      .onSnapshot(snapshot =>
+        this.setState({ sharedDocuments: snapshot.docs.map(d => d.data()) })
+      );
+
     this.setState({
       client,
       tutor
     });
-
-    this.props.history.listen(location => {
-      if (this.state.previewTracks) {
-        this.state.previewTracks.forEach(track => {
-          track.stop();
-        });
-      }
-      this.state.activeRoom = null;
-      this.setState({ hasJoinedRoom: false, localMediaAvailable: false });
-    });
   }
 
   componentWillUnmount() {
+    this.leaveRoom();
+    this.disconnect();
+  }
+
+  getSessionId() {
+    const params = new URLSearchParams(this.props.location.search);
+    return params.get("s");
+  }
+
+  disconnect() {
     if (this.state.previewTracks) {
       this.state.previewTracks.forEach(track => {
         track.stop();
@@ -101,11 +122,6 @@ class Session extends Component {
     }
     this.state.activeRoom = null;
     this.setState({ hasJoinedRoom: false, localMediaAvailable: false });
-  }
-
-  getSessionId() {
-    const params = new URLSearchParams(this.props.location.search);
-    return params.get("s");
   }
 
   joinRoom() {
@@ -140,7 +156,24 @@ class Session extends Component {
 
   leaveRoom() {
     this.state.activeRoom.disconnect();
-    this.setState({ hasJoinedRoom: false, localMediaAvailable: false });
+  }
+
+  storeFile(acceptedFiles) {
+    acceptedFiles.forEach(async acceptedFile => {
+      const storageRef = firebase.storage.ref();
+
+      const mainFile = storageRef.child(acceptedFile.name);
+
+      const data = await mainFile.put(acceptedFile);
+
+      const url = await mainFile.getDownloadURL();
+
+      firebase.db
+        .collection("sessions")
+        .doc(this.state.sessionId)
+        .collection("sharedDocuments")
+        .add({ from: this.context.user.uid, url });
+    });
   }
 
   participantConnected(participant, previewContainer) {
@@ -152,9 +185,6 @@ class Session extends Component {
     participant.tracks.forEach(publication => {
       if (publication.isSubscribed) {
         this.attachTrack([publication.track], previewContainer); // will never get called
-        console.log(publication);
-        console.log(publication.track);
-        console.log(publication.track.attach());
       } else {
         console.log("not subscribed to: ", publication.trackName);
       }
@@ -200,29 +230,31 @@ class Session extends Component {
     );
 
     room.on("disconnected", () => {
-      if (this.state.previewTracks) {
-        this.state.previewTracks.forEach(track => {
-          track.stop();
-        });
-      }
-      this.state.activeRoom = null;
-      this.setState({
-        hasJoinedRoom: false,
-        localMediaAvailable: false,
-        remoteMediaAvailable: false
-      });
+      console.log("h");
+      this.leaveRoom();
+      this.disconnect();
     });
   }
 
   render() {
-    let joinOrLeaveRoomButton = this.state.hasJoinedRoom ? (
-      <button onClick={this.leaveRoom}>Leave room</button>
-    ) : (
-      <button onClick={this.joinRoom}>Join room</button>
-    );
-
     if (this.state.loading) {
       return <Loader active>Loading Session</Loader>;
+    }
+
+    if (!this.state.hasJoinedRoom) {
+      return (
+        <SmallButton
+          onClick={this.joinRoom}
+          style={{
+            width: "20%",
+            position: "absolute",
+            top: "40%",
+            right: "40%"
+          }}
+        >
+          <ButtonText>Join Session</ButtonText>
+        </SmallButton>
+      );
     }
 
     if (!this.state.open) {
@@ -231,6 +263,32 @@ class Session extends Component {
 
     return (
       <div>
+        <Menu>
+          <End>
+            <SmallButton onClick={this.leaveRoom}>
+              <ButtonText>Leave Session</ButtonText>
+            </SmallButton>
+          </End>
+        </Menu>
+        <Dropzone onDrop={this.storeFile}>
+          {({ getRootProps, getInputProps }) => (
+            <section>
+              <div {...getRootProps()}>
+                <input {...getInputProps()} />
+                <p>Drag 'n' drop some files here, or click to select files</p>
+              </div>
+            </section>
+          )}
+        </Dropzone>
+        {this.state.sharedDocuments && (
+          <FileViewer
+            fileType={"jpg"}
+            filePath={this.state.sharedDocuments[0].url}
+          />
+        )}
+        {this.state.sharedDocuments.map(d => (
+          <p>{d.url}</p>
+        ))}
         <Bar>
           <Col>
             {this.state.localMediaAvailable && (
@@ -253,7 +311,6 @@ class Session extends Component {
             <VideoContainer ref="remoteMedia" />
           </Col>
         </Bar>
-        {joinOrLeaveRoomButton}
       </div>
     );
   }
@@ -268,6 +325,17 @@ const VideoContainer = styled.div`
   > video {
     width: 240px;
   }
+`;
+
+const Menu = styled.div`
+  display: flex;
+  flex-direction: row;
+  padding: 1%;
+`;
+
+const End = styled.div`
+  display: flex;
+  justify-content: end;
 `;
 
 const Bar = styled.div`

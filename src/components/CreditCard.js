@@ -10,11 +10,11 @@ const stripePromise = loadStripe("pk_test_bU6fic7evc6iCPcQUF12bSio00NCEObVIb");
 
 class CreditCard extends Component {
   async componentDidMount() {
-    const stripeCustomerCall = firebase.functions.httpsCallable(
+    /*const stripeCustomerCall = firebase.functions.httpsCallable(
       "getStripeCustomer"
     );
     const stripeCustomer = await stripeCustomerCall();
-    console.log(stripeCustomer);
+    console.log(stripeCustomer);*/
   }
 
   render() {

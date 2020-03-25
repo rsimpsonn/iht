@@ -7,7 +7,7 @@ const db = admin.firestore();
 
 const stripe = require("stripe")(functions.config().stripe.token);
 
-exports.getStripeCustomer = functions.http.onCall(async (data, context) => {
+/*exports.getStripeCustomer = functions.http.onCall(async (data, context) => {
   const uid = context.auth.uid;
 
   const stripeCustomerDoc = await db.doc("stripe_customers/" + uid).get();
@@ -28,7 +28,7 @@ exports.getStripeCustomer = functions.http.onCall(async (data, context) => {
     error: null,
     customer
   };
-});
+});*/
 
 exports.createIntent = functions.firestore
   .document("stripe_customers/{userId}/intents/{newIntent}")
@@ -52,6 +52,7 @@ exports.completeSessions = functions.pubsub
     db.collection("sessions")
       .where("status", "==", "Upcoming")
       .where("end", "<=", now)
+      .get()
       .then(snapshot => {
         snapshot.docs.forEach(d => {
           const sessionData = d.data();

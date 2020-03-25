@@ -54,7 +54,6 @@ class ClientDashboard extends Component {
             };
           }
 
-          console.log(this.state.sessions === newSessions);
           this.setState({
             sessions: newSessions.sort(
               (a, b) => a.start.toDate().getTime() - b.start.toDate().getTime()
