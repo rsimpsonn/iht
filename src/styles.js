@@ -11,6 +11,11 @@ export const Header = styled.p`
     `
   margin: 20px 20px 20px 0;
   `}
+
+  ${props =>
+    props.color &&
+    `
+  color: ${props.color}`}
 `;
 
 export const SubHeader = styled.p`
@@ -24,6 +29,11 @@ export const SubHeader = styled.p`
     `
   margin: 20px 10px 10px 0;
   `}
+
+  ${props =>
+    props.color &&
+    `
+  color: ${props.color}`}
 `;
 
 export const Small = styled.p`
@@ -37,6 +47,21 @@ export const Small = styled.p`
     `
   margin: 10px 10px 10px 0;
   `}
+
+  ${props =>
+    props.color &&
+    `
+  color: ${props.color}`}
+
+  ${props =>
+    props.bold &&
+    `
+  font-weight: Bold`}
+
+  ${props =>
+    props.cursor &&
+    `
+  cursor: pointer`}
 `;
 
 export const Tiny = styled.p`
@@ -50,6 +75,21 @@ export const Tiny = styled.p`
     `
   margin: 10px 10px 10px 0;
   `}
+
+  ${props =>
+    props.color &&
+    `
+  color: ${props.color}`}
+
+  ${props =>
+    props.bold &&
+    `
+  font-weight: Bold`}
+
+  ${props =>
+    props.cursor &&
+    `
+  cursor: pointer`}
 `;
 
 export const SmallButton = styled.div`
@@ -59,7 +99,6 @@ export const SmallButton = styled.div`
   cursor: pointer;
   display: flex;
   justify-content: center;
-  width: 60%;
   margin: auto;
 
   ${props =>

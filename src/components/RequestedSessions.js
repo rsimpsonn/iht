@@ -9,12 +9,12 @@ import RequestedSession from "./RequestedSession";
 import { Header } from "../styles";
 
 function RequestedSessions(props) {
-  if (!props.sessions) {
+  if (!props.sessions || props.sessions.length === 0) {
     return <div />;
   }
   return (
     <TopMargin>
-      {props.sessions.length > 0 && <Header>Requested Sessions</Header>}
+      <Header>Requested Sessions</Header>
       <Bar>
         {props.sessions.map(s => (
           <RequestedSession session={s} />

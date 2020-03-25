@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Dropdown, TextArea, Popup, Divider } from "semantic-ui-react";
 
 import AvailableTimes from "./AvailableTimes";
+import { smallDayMonthDateFullTime } from "../timeFormatter";
 
 import styled from "styled-components";
 import getSubject from "../subjects";
@@ -13,7 +14,7 @@ import {
   AiOutlineClockCircle,
   AiOutlineStar
 } from "react-icons/ai";
-import { SubHeader, Small, Tiny } from "../styles";
+import { SubHeader, Small, Tiny, SmallButton, ButtonText } from "../styles";
 import getUniversity from "../universities";
 
 class ScheduleSession extends Component {
@@ -26,7 +27,6 @@ class ScheduleSession extends Component {
 
   state = {
     subjectsAvailable: [],
-    additionalInfo: "",
     frontSide: true,
     university: ""
   };
@@ -97,8 +97,7 @@ class ScheduleSession extends Component {
         end: this.state.selectedTimeSlot.end,
         status: "Requested",
         subjectID: this.state.selectedSubject,
-        tutor: this.props.tutor.id,
-        additionalInfo: this.state.additionalInfo
+        tutor: this.props.tutor.id
       });
     }
   }
@@ -168,6 +167,7 @@ class ScheduleSession extends Component {
           <div>
             <Dropdown
               placeholder="Subject"
+              style={{ margin: "10px 0" }}
               fluid
               selection
               options={subjectOptions}
@@ -175,7 +175,29 @@ class ScheduleSession extends Component {
                 this.setState({ selectedSubject: data.value })
               }
             />
-            <Popup trigger={<p>{selectTimeText}</p>} hoverable fluid flowing>
+            <Popup
+              trigger={
+                <GrayLine style={{ margin: "10px 0" }}>
+                  <Small
+                    color={
+                      this.state.selectedTimeSlot
+                        ? "black"
+                        : "rgba(191,191,191,.87)"
+                    }
+                  >
+                    {!this.state.selectedTimeSlot
+                      ? "Select Time"
+                      : smallDayMonthDateFullTime(
+                          this.state.selectedTimeSlot.start,
+                          this.state.selectedTimeSlot.end
+                        )}
+                  </Small>
+                </GrayLine>
+              }
+              hoverable
+              fluid
+              flowing
+            >
               <AvailableTimes
                 callback={selectedTimeSlot =>
                   this.setState({ selectedTimeSlot })
@@ -188,17 +210,10 @@ class ScheduleSession extends Component {
                 }
               />
             </Popup>
-            <TextArea
-              onChange={e => this.setState({ additionalInfo: e.target.value })}
-              fluid
-              flowing
-              placeholder="Additional information"
-              rows={2}
-              cols={10}
-            />
-            <GreenButton onClick={this.requestSession}>
+            <Divider />
+            <SmallButton onClick={this.requestSession}>
               <ButtonText>Request Session</ButtonText>
-            </GreenButton>
+            </SmallButton>
           </div>
         )}
         {!this.state.frontSide && (
@@ -216,13 +231,13 @@ class ScheduleSession extends Component {
               <BetterStar size={25} favorite={this.props.favorite} />
               <BetterStar size={25} favorite={this.props.favorite} />
 
-              <GreenButton
+              <SmallButton
                 onClick={() =>
                   this.setState({ frontSide: !this.state.frontSide })
                 }
               >
                 <ButtonText>Schedule</ButtonText>
-              </GreenButton>
+              </SmallButton>
             </Menu>
             <p>{this.props.tutor.sessions + " sessions"}</p>
           </div>
@@ -263,6 +278,7 @@ const Box = styled.div`
   border-radius: 8px;
   margin: 0 15px;
   padding: 15px;
+  min-width: 17.5%;
   width: 17.5%;
 `;
 
@@ -271,26 +287,6 @@ const Bar = styled.div`
   flex-direction: row;
   justify-content: end;
   align-items: center;
-`;
-
-const GreenButton = styled.div`
-  border-radius: 15px;
-  background-color: #09aa82;
-  padding: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-
-  &:hover {
-    transform: scale(1.1);
-  }
-`;
-
-const ButtonText = styled.p`
-  font-family: Lato;
-  font-size: 14px;
-  color: white;
 `;
 
 const Menu = styled.div`
@@ -304,6 +300,12 @@ const Row = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+`;
+
+const GrayLine = styled.div`
+  padding: 8px 12px;
+  border: 1px solid rgba(34, 36, 38, 0.15);
+  border-radius: 0.3em;
 `;
 
 const Info = styled.p`

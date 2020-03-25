@@ -9,18 +9,18 @@ import { Header } from "../styles";
 import PastSession from "./PastSession";
 
 function PastSessions(props) {
-  if (!props.sessions) {
+  if (!props.sessions || props.sessions.length === 0) {
     return <div />;
   }
   return (
-    <div>
-      {props.sessions.length > 0 && <Header>Past Sessions</Header>}
+    <TopMargin>
+      <Header>Past Sessions</Header>
       <Bar>
         {props.sessions.map(s => (
           <PastSession session={s} />
         ))}
       </Bar>
-    </div>
+    </TopMargin>
   );
 }
 
@@ -28,6 +28,10 @@ const Bar = styled.div`
   display: flex;
   padding: 2%;
   flex-direction: row;
+`;
+
+const TopMargin = styled.div`
+  padding: 20px 0 20px;
 `;
 
 export default PastSessions;

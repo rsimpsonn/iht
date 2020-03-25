@@ -56,7 +56,9 @@ class ClientDashboard extends Component {
 
           console.log(this.state.sessions === newSessions);
           this.setState({
-            sessions: newSessions
+            sessions: newSessions.sort(
+              (a, b) => a.start.toDate().getTime() - b.start.toDate().getTime()
+            )
           });
         });
       });
@@ -66,27 +68,30 @@ class ClientDashboard extends Component {
     if (!this.state.client) {
       return <div />;
     }
+
+    const upcomingSessions = this.state.sessions.filter(
+      s => s.status === "Upcoming"
+    );
+    const requestedSessions = this.state.sessions.filter(
+      s => s.status === "Requested"
+    );
+    const pastSessions = this.state.sessions.filter(
+      s =>
+        s.status === "Cancelled fee" ||
+        s.status === "Cancelled no fee" ||
+        s.status === "Completed" ||
+        s.status === "No Show"
+    );
+
     return (
       <div>
-        <UpcomingSessions
-          sessions={this.state.sessions.filter(s => s.status === "Upcoming")}
-        />
-        <Divider />
+        <UpcomingSessions sessions={upcomingSessions} />
+        {upcomingSessions.length > 0 && <Divider />}
         <ScheduleSessions client={this.state.client} />
-        <Divider />
-        <RequestedSessions
-          sessions={this.state.sessions.filter(s => s.status === "Requested")}
-        />
-        <Divider />
-        <PastSessions
-          sessions={this.state.sessions.filter(
-            s =>
-              s.status === "Cancelled fee" ||
-              s.status === "Cancelled no fee" ||
-              s.status === "Completed" ||
-              s.status === "No Show"
-          )}
-        />
+        {requestedSessions.length > 0 && <Divider />}
+        <RequestedSessions sessions={requestedSessions} />
+        {pastSessions.length > 0 && <Divider />}
+        <PastSessions sessions={pastSessions} />
       </div>
     );
   }

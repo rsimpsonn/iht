@@ -3,6 +3,9 @@ import { Grid } from "semantic-ui-react";
 import firebase from "../firebase";
 import styled from "styled-components";
 
+import { Small, Tiny } from "../styles";
+import { fullTime } from "../timeFormatter";
+
 const abbreviations = ["Sun", "Mon", "Tues", "Wed", "Thurs", "Fri", "Sat"];
 
 class AvailableTimes extends Component {
@@ -115,27 +118,19 @@ class AvailableTimes extends Component {
           date.setDate(now.getDate() + d);
           console.log(date);
           return (
-            <Grid.Column textAlign="center">
-              <p>
+            <Grid.Column style={{ width: 140 }} textAlign="center">
+              <Tiny>
                 {abbreviations[date.getDay()]} {date.getMonth()}/
                 {date.getDate()}
-              </p>
+              </Tiny>
               {hourSlots
                 .filter(s => s.start.getDate() === date.getDate())
                 .map(s => (
-                  <BetterP
-                    selected={
-                      this.props.selected
-                        ? this.props.selected === s.start.getTime()
-                        : false
-                    }
-                    onClick={() => this.props.callback(s)}
-                  >
-                    {s.start.getHours() % 12 === 0
-                      ? 12
-                      : s.start.getHours() % 12}{" "}
-                    - {s.end.getHours() % 12 === 0 ? 12 : s.end.getHours() % 12}
-                  </BetterP>
+                  <GrayLine onClick={() => this.props.callback(s)}>
+                    <Tiny bold={this.props.selected === s.start.getTime()}>
+                      {fullTime(s.start, s.end)}
+                    </Tiny>
+                  </GrayLine>
                 ))}
             </Grid.Column>
           );
@@ -160,6 +155,14 @@ const Bar = styled.div`
   flex-direction: row;
   align-items: start;
   justify-content: start;
+`;
+
+const GrayLine = styled.div`
+  padding: 8px 12px;
+  border: 1px solid rgba(34, 36, 38, 0.15);
+  border-radius: 0.3em;
+  margin: 10px 0;
+  cursor: pointer;
 `;
 
 const Col = styled.div`
