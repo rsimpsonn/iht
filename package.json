@@ -4,6 +4,8 @@
   "private": true,
   "dependencies": {
     "@babel/plugin-proposal-export-default-from": "^7.8.3",
+    "@stripe/react-stripe-js": "^1.1.0",
+    "@stripe/stripe-js": "^1.2.0",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
@@ -13,6 +15,7 @@
     "firebase": "^7.11.0",
     "global": "^4.4.0",
     "googleapis": "39",
+    "qs": "^6.9.2",
     "react": "^16.13.0",
     "react-available-times": "^1.4.0",
     "react-big-calendar": "^0.24.1",
@@ -23,6 +26,7 @@
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.4.0",
     "semantic-ui-react": "^0.88.2",
+    "stripe": "^8.34.0",
     "styled-components": "^5.0.1",
     "twilio": "^3.41.1",
     "twilio-video": "^2.3.0"
