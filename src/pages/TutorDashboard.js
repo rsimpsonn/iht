@@ -44,23 +44,28 @@ class TutorDashboard extends Component {
 
           console.log(this.state.sessions === newSessions);
           this.setState({
-            sessions: newSessions
+            sessions: newSessions.sort(
+              (a, b) => a.start.toDate().getTime() - b.start.toDate().getTime()
+            )
           });
         });
       });
   }
 
   render() {
+    const upcomingSessions = this.state.sessions.filter(
+      s => s.status === "Upcoming"
+    );
+    const requestedSessions = this.state.sessions.filter(
+      s => s.status === "Requested"
+    );
+
     return (
       <div>
-        <UpcomingSessions
-          sessions={this.state.sessions.filter(s => s.status === "Upcoming")}
-        />
-        <Divider />
-        <RequestedSessions
-          sessions={this.state.sessions.filter(s => s.status === "Requested")}
-        />
-        <Divider />
+        <UpcomingSessions sessions={upcomingSessions} />
+        {upcomingSessions.length > 0 && <Divider />}
+        <RequestedSessions sessions={requestedSessions} />
+        {requestedSessions.length > 0 && <Divider />}
         <PastSessions
           sessions={this.state.sessions.filter(
             s =>

@@ -152,18 +152,24 @@ class RequestedSession extends Component {
             </div>
             <Row>
               <Circle src={this.state.meetingWith.profilePic} />
+              <Popup
+                trigger={
+                  <AiOutlineSetting
+                    color="#5a5a5a"
+                    size={14}
+                    style={{ margin: "0 0 0 10px" }}
+                  />
+                }
+                position="bottom center"
+                flowing
+                hoverable
+                onClick={() => this.confirmCancel()}
+              >
+                <Bar>
+                  <Cancel>Cancel</Cancel>
+                </Bar>
+              </Popup>
             </Row>
-            <Popup
-            trigger={<AiOutlineSetting color="#5a5a5a" size={14} />}
-            position="bottom center"
-            flowing
-            hoverable
-            onClick={() => this.confirmCancel()}
-          >
-            <Bar>
-              <Cancel>Cancel</Cancel>
-            </Bar>
-          </Popup>
           </Menu>
           <Divider />
           <Tiny margin>
@@ -176,7 +182,6 @@ class RequestedSession extends Component {
             {endDate.getHours() % 12 == 0 ? 12 : endDate.getHours() % 12}
             {endDate.getHours() > 11 ? "PM" : "AM"}
           </Tiny>
-          
         </Box>
       );
     }
@@ -206,6 +211,7 @@ const Box = styled.div`
   border-radius: 8px;
   margin: 0 15px;
   padding: 15px;
+  min-width: 17.5%;
   width: 17.5%;
 `;
 

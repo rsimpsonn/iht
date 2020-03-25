@@ -9,14 +9,14 @@ import { Header } from "../styles";
 import UpcomingSession from "./UpcomingSession";
 
 function UpcomingSessions(props) {
-  if (!props.sessions) {
+  if (!props.sessions || props.sessions.length === 0) {
     return <div />;
   }
   return (
     <userContext.Consumer>
       {userContext => (
         <TopMargin>
-          {props.sessions.length > 0 && <Header>Upcoming Sessions</Header>}
+          <Header>Upcoming Sessions</Header>
           <Bar>
             {props.sessions.map(s => (
               <UpcomingSession userContext={userContext} session={s} />
@@ -29,9 +29,11 @@ function UpcomingSessions(props) {
 }
 
 const Bar = styled.div`
-  display: flex;
+  width: 100%;
   padding: 2%;
+  display: flex;
   flex-direction: row;
+  overflow-x: scroll;
 `;
 
 const TopMargin = styled.div`
