@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import styled from "styled-components";
 import { Dropdown, Divider } from "semantic-ui-react";
+import CreditCard from "../components/CreditCard";
 
 import {
   Header,
@@ -196,6 +197,10 @@ class ClientSettings extends Component {
                 <ButtonText>Edit Profile</ButtonText>
               </SmallButton>
             )}
+          </Card>
+          <Card>
+            <Header margin>Credit Card Information</Header>
+            <CreditCard />
           </Card>
         </Main>
       </Row>

@@ -12,12 +12,14 @@ const config = {
 };
 
 let app = firebase.initializeApp(config);
+firebase.functions().useFunctionsEmulator("http://localhost:3000");
 firebase.analytics();
 
 const fb = {
   auth: firebase.auth(),
   db: firebase.firestore(app),
-  storage: firebase.storage()
+  storage: firebase.storage(),
+  functions: firebase.functions()
 };
 
 export default fb;
