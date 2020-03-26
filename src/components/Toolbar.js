@@ -11,6 +11,7 @@ import firebase from "../firebase";
 import { withRouter } from "react-router-dom";
 import Alerts from "./Alerts";
 import User from "./User";
+import EmailNotVerified from "./EmailNotVerified";
 
 import {
   AiOutlineBell,
@@ -22,53 +23,63 @@ function Toolbar(props) {
   return (
     <userContext.Consumer>
       {context => (
-        <Menu>
-          <Header>
-            <StyledLink to="/">Ivy Home Tutors</StyledLink>
-          </Header>
-          {context.user == null && (
-            <ListItem bold onClick={() => props.history.push("/signin")}>
-              Sign In
-            </ListItem>
-          )}
-          {context.user != null && (
-            <Bar>
-              <Icon onClick={() => props.history.push("/dashboard")}>
-                <AiOutlineHome style={{ margin: 5 }} size={25} />
-                <ListItem bold>Dashboard</ListItem>
-              </Icon>
-              <Icon onClick={() => props.history.push("/calendar")}>
-                <AiOutlineCalendar style={{ margin: 5 }} size={25} />
-                <ListItem bold>Calendar</ListItem>
-              </Icon>
-              <Alerts userContext={context} />
-              <Icon>
-                <Popup
-                  trigger={
-                    <User isTutor={context.isTutor} id={context.user.uid} />
-                  }
-                  position="bottom right"
-                  flowing
-                  hoverable
-                >
-                  <ListItem onClick={() => props.history.push("/settings")}>
-                    Settings
-                  </ListItem>
-                  {context.isTutor && (
-                    <ListItem
-                      onClick={() => props.history.push("/availability")}
-                    >
-                      Set Availability
+        <div>
+          <Menu>
+            <Header>
+              <StyledLink to="/">Ivy Home Tutors</StyledLink>
+            </Header>
+            {(context.user == null || !context.user.emailVerified) && (
+              <ListItem bold onClick={() => props.history.push("/signin")}>
+                Sign In
+              </ListItem>
+            )}
+            {context.user != null && context.user.emailVerified && (
+              <Bar>
+                <Icon onClick={() => props.history.push("/dashboard")}>
+                  <AiOutlineHome style={{ margin: 5 }} size={25} />
+                  <ListItem bold>Dashboard</ListItem>
+                </Icon>
+                <Icon onClick={() => props.history.push("/calendar")}>
+                  <AiOutlineCalendar style={{ margin: 5 }} size={25} />
+                  <ListItem bold>Calendar</ListItem>
+                </Icon>
+                <Alerts userContext={context} />
+                <Icon>
+                  <Popup
+                    trigger={
+                      <User isTutor={context.isTutor} id={context.user.uid} />
+                    }
+                    position="bottom right"
+                    flowing
+                    hoverable
+                  >
+                    <ListItem onClick={() => props.history.push("/settings")}>
+                      Settings
                     </ListItem>
-                  )}
-                  <ListItem onClick={() => firebase.auth.signOut()}>
-                    Sign Out
-                  </ListItem>
-                </Popup>
-              </Icon>
-            </Bar>
+                    {context.isTutor && (
+                      <ListItem
+                        onClick={() => props.history.push("/availability")}
+                      >
+                        Set Availability
+                      </ListItem>
+                    )}
+                    <ListItem
+                      onClick={() => {
+                        firebase.auth.signOut();
+                        props.history.push("/");
+                      }}
+                    >
+                      Sign Out
+                    </ListItem>
+                  </Popup>
+                </Icon>
+              </Bar>
+            )}
+          </Menu>
+          {context.user != null && !context.user.emailVerified && (
+            <EmailNotVerified />
           )}
-        </Menu>
+        </div>
       )}
     </userContext.Consumer>
   );

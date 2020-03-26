@@ -34,8 +34,12 @@ function Dashboard(props) {
             }
           </alertContext.Consumer>
           <TopMargin>
-            {userContext.isTutor && <TutorDashboard />}
-            {userContext.user && !userContext.isTutor && <ClientDashboard />}
+            {userContext.isTutor && userContext.user.emailVerified && (
+              <TutorDashboard />
+            )}
+            {userContext.user &&
+              !userContext.isTutor &&
+              userContext.user.emailVerified && <ClientDashboard />}
           </TopMargin>
         </div>
       )}

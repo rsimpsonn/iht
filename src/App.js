@@ -16,6 +16,9 @@ import Dashboard from "./pages/Dashboard";
 import Availability from "./pages/Availability";
 import Session from "./pages/Session";
 import Settings from "./pages/Settings";
+import ForgotPassword from "./pages/ForgotPassword";
+import UserManagementForm from "./pages/UserManagementForm";
+import ClientSignUp from "./pages/ClientSignUp";
 
 import Toolbar from "./components/Toolbar";
 
@@ -27,7 +30,7 @@ import userDetailsContext from "./contexts/userDetailsContext";
 function App() {
   const useAuth = () => {
     const [state, setState] = React.useState(() => {
-      const user = firebase.auth.currentUser;
+      let user = firebase.auth.currentUser;
       return {
         initializing: !user,
         user,
@@ -38,13 +41,17 @@ function App() {
     async function onChange(user) {
       let isTutor = false;
       if (user !== null) {
-        const ref = firebase.db.collection("users").doc(user.uid);
-        const doc = await ref.get();
-        isTutor = doc.data().isTutor;
-
-        setState({ initializing: false, user, isTutor });
+        firebase.db
+          .collection("users")
+          .doc(user.uid)
+          .onSnapshot(doc => {
+            if (doc.exists) {
+              isTutor = doc.data().isTutor;
+              setState({ initializing: false, isTutor, user });
+            }
+          });
       } else {
-        setState({ initializing: false, user, isTutor });
+        setState({ initializing: false, isTutor, user });
       }
     }
 
@@ -122,6 +129,15 @@ function App() {
           <Router>
             <Toolbar />
             <Switch>
+              <Route path="/signup">
+                <ClientSignUp />
+              </Route>
+              <Route path="/userManagement">
+                <UserManagementForm />
+              </Route>
+              <Route path="/forgotpassword">
+                <ForgotPassword />
+              </Route>
               <Route path="/settings">
                 <Settings />
               </Route>

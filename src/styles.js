@@ -92,7 +92,7 @@ export const Tiny = styled.p`
   cursor: pointer`}
 `;
 
-export const SmallButton = styled.div`
+export const SmallButton = styled.button`
   background-color: #09aa82;
   border-radius: 20px;
   padding: 8px 10px;
@@ -100,6 +100,12 @@ export const SmallButton = styled.div`
   display: flex;
   justify-content: center;
   margin: auto;
+  border-width: 0px;
+  width: 100%;
+
+  &:focus {
+    outline: none;
+  }
 
   ${props =>
     props.color &&

@@ -25,6 +25,7 @@
     "react-file-viewer": "^1.2.1",
     "react-hooks": "^1.0.1",
     "react-icons": "^3.9.0",
+    "react-multimedia-capture": "^1.2.4",
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.4.0",
     "reactjs-pdf-reader": "^1.0.9",

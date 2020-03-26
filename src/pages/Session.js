@@ -7,6 +7,10 @@ import userContext from "../contexts/userContext";
 import firebase from "../firebase";
 import { generateToken } from "../generateToken";
 
+import axios from "axios";
+
+import MediaCapturer from "react-multimedia-capture";
+
 import {
   SmallButton,
   ButtonText,
@@ -37,6 +41,17 @@ class Session extends Component {
     this.participantConnected = this.participantConnected.bind(this);
     this.disconnect = this.disconnect.bind(this);
     this.storeFile = this.storeFile.bind(this);
+    this.handleRequest = this.handleRequest.bind(this);
+    this.handleGranted = this.handleGranted.bind(this);
+    this.handleDenied = this.handleDenied.bind(this);
+    this.handleStart = this.handleStart.bind(this);
+    this.handleStop = this.handleStop.bind(this);
+    this.handlePause = this.handlePause.bind(this);
+    this.handleResume = this.handleResume.bind(this);
+    this.handleStreamClose = this.handleStreamClose.bind(this);
+    this.setStreamToVideo = this.setStreamToVideo.bind(this);
+    this.releaseStreamFromVideo = this.releaseStreamFromVideo.bind(this);
+    this.downloadVideo = this.downloadVideo.bind(this);
   }
   static contextType = userContext;
 
@@ -44,7 +59,10 @@ class Session extends Component {
     loading: true,
     open: false,
     client: {},
-    tutor: {}
+    tutor: {},
+    recording: false,
+    paused: false,
+    granted: false
   };
 
   async componentDidMount() {
@@ -161,6 +179,7 @@ class Session extends Component {
   }
 
   leaveRoom() {
+    if (this.state.activeRoom == null) return;
     this.state.activeRoom.disconnect();
   }
 
@@ -220,6 +239,7 @@ class Session extends Component {
     });
 
     var previewContainer = this.refs.localMedia;
+    console.log(previewContainer);
     var remoteContainer = this.refs.remoteMedia;
 
     if (!previewContainer.querySelector("video")) {
@@ -243,10 +263,83 @@ class Session extends Component {
     );
 
     room.on("disconnected", () => {
-      console.log("h");
       this.leaveRoom();
       this.disconnect();
     });
+  }
+
+  handleRequest() {
+    console.log("Request Recording...");
+  }
+  handleGranted() {
+    this.setState({ granted: true });
+    console.log("Permission Granted!");
+  }
+  handleDenied(err) {
+    this.setState({ rejectedReason: err.name });
+    console.log("Permission Denied!", err);
+  }
+  handleStart(stream) {
+    this.setState({
+      recording: true
+    });
+
+    this.setStreamToVideo(stream);
+    console.log("Recording Started.");
+  }
+  handleStop(blob) {
+    this.setState({
+      recording: false
+    });
+
+    this.releaseStreamFromVideo();
+
+    console.log("Recording Stopped.");
+    this.downloadVideo(blob);
+  }
+  handlePause() {
+    this.releaseStreamFromVideo();
+
+    this.setState({
+      paused: true
+    });
+  }
+  handleResume(stream) {
+    this.setStreamToVideo(stream);
+
+    this.setState({
+      paused: false
+    });
+  }
+  handleError(err) {
+    console.log(err);
+  }
+  handleStreamClose() {
+    this.setState({
+      granted: false
+    });
+  }
+  setStreamToVideo(stream) {
+    console.log(this.refs.testMedia);
+    if (this.refs.testMedia.srcObject) {
+      this.refs.testMedia.srcObject = stream;
+    } else {
+      this.refs.testMedia.src = stream;
+    }
+  }
+  releaseStreamFromVideo() {
+    this.refs.testMedia.srcObject = null;
+  }
+  downloadVideo(blob) {
+    axios.post();
+    let url = URL.createObjectURL(blob);
+    let a = document.createElement("a");
+    a.style.display = "none";
+    a.href = url;
+    a.target = "_blank";
+    document.body.appendChild(a);
+
+    a.click();
   }
 
   render() {
@@ -329,8 +422,40 @@ class Session extends Component {
       )
     });
 
+    const granted = this.state.granted;
+    const paused = this.state.paused;
+    const recording = this.state.recording;
+
     return (
       <div>
+        <MediaCapturer
+          constraints={{ audio: true, video: true }}
+          timeSlice={10}
+          onRequestPermission={this.handleRequest}
+          onGranted={this.handleGranted}
+          onDenied={this.handleDenied}
+          onStart={this.handleStart}
+          onStop={this.handleStop}
+          onPause={this.handlePause}
+          onResume={this.handleResume}
+          onError={this.handleError}
+          onStreamClosed={this.handleStreamClose}
+          render={({ request, start, stop, pause, resume }) => (
+            <div>
+              <p>Granted: {granted.toString()}</p>
+              <p>Recording: {recording.toString()}</p>
+              <p>Paused: {paused.toString()}</p>
+
+              {!granted && <button onClick={request}>Get Permission</button>}
+              <button onClick={start}>Start</button>
+              <button onClick={stop}>Stop</button>
+              <button onClick={pause}>Pause</button>
+              <button onClick={resume}>Resume</button>
+            </div>
+          )}
+        />
+        <p>Streaming test</p>
+        <video ref="testMedia" autoPlay />
         <SmallButton
           style={{ position: "absolute", bottom: 10, left: 10 }}
           onClick={this.leaveRoom}
@@ -377,6 +502,7 @@ const VideoContainer = styled.div`
 
   > video {
     width: 240px;
+    height: 180px;
   }
 `;
 

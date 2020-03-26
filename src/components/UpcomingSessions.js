@@ -9,7 +9,7 @@ import { Header } from "../styles";
 import UpcomingSession from "./UpcomingSession";
 
 function UpcomingSessions(props) {
-  if (!props.sessions || props.sessions.length === 0) {
+  if (!props.sessions) {
     return <div />;
   }
 

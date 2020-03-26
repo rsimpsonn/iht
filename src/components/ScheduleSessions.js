@@ -34,16 +34,18 @@ class ScheduleSessions extends Component {
   async componentDidMount() {
     let favorites = [];
 
-    this.props.client.favorites.forEach(async f => {
-      const t = await getTutor(f);
-      favorites.push({ favorite: true, ...t });
+    if (this.props.client.favorites) {
+      this.props.client.favorites.forEach(async f => {
+        const t = await getTutor(f);
+        favorites.push({ favorite: true, ...t });
 
-      if (this.props.client.favorites.length === favorites.length) {
-        this.setState({
-          favorites
-        });
-      }
-    });
+        if (this.props.client.favorites.length === favorites.length) {
+          this.setState({
+            favorites
+          });
+        }
+      });
+    }
 
     const snapshot = await firebase.db
       .collection("sessions")
@@ -58,6 +60,7 @@ class ScheduleSessions extends Component {
       if (recents.filter(c => c.id === t.id).length === 0) {
         recents.push({
           favorite:
+            this.props.client.favorites ||
             this.props.client.favorites.filter(e => e.id === t.id).length === 1,
           ...t
         });
