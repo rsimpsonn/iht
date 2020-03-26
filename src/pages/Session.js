@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import styled from "styled-components";
 import { withRouter } from "react-router-dom";
-import { Loader } from "semantic-ui-react";
+import { Loader, Tab } from "semantic-ui-react";
 
 import userContext from "../contexts/userContext";
 import firebase from "../firebase";
@@ -19,7 +19,13 @@ import {
 import Video from "twilio-video";
 
 import Dropzone from "react-dropzone";
-import FileViewer from "react-file-viewer";
+import { PDFReader } from "reactjs-pdf-reader";
+
+const imageType = {
+  "image/jpeg": "jpg",
+  "application/pdf": "pdf",
+  "image/png": "png"
+};
 
 class Session extends Component {
   constructor(props) {
@@ -160,6 +166,7 @@ class Session extends Component {
 
   storeFile(acceptedFiles) {
     acceptedFiles.forEach(async acceptedFile => {
+      console.log(acceptedFile);
       const storageRef = firebase.storage.ref();
 
       const mainFile = storageRef.child(acceptedFile.name);
@@ -172,7 +179,13 @@ class Session extends Component {
         .collection("sessions")
         .doc(this.state.sessionId)
         .collection("sharedDocuments")
-        .add({ from: this.context.user.uid, url });
+        .add({
+          from: this.context.user.uid,
+          url,
+          name: acceptedFile.name,
+          type: imageType[acceptedFile.type],
+          addedAt: new Date()
+        });
     });
   }
 
@@ -261,56 +274,96 @@ class Session extends Component {
       return <p>You are not authorized to access this tutoring session</p>;
     }
 
-    return (
-      <div>
-        <Menu>
-          <End>
-            <SmallButton onClick={this.leaveRoom}>
-              <ButtonText>Leave Session</ButtonText>
-            </SmallButton>
-          </End>
-        </Menu>
+    const documents = this.state.sharedDocuments
+      .sort(
+        (a, b) => a.addedAt.toDate().getTime() - b.addedAt.toDate().getTime()
+      )
+      .map(d => {
+        return {
+          menuItem: d.name.substring(0, 5) + "...",
+          render: () => {
+            switch (d.type) {
+              case "pdf":
+                return (
+                  <Scroll>
+                    <PDFReader showAllPage width={550} url={d.url} />
+                  </Scroll>
+                );
+              default:
+                return (
+                  <Scroll>
+                    <img style={{ width: 550 }} src={d.url} />
+                  </Scroll>
+                );
+            }
+          }
+        };
+      });
+
+    documents.push({
+      menuItem: "Add Document",
+      render: () => (
         <Dropzone onDrop={this.storeFile}>
           {({ getRootProps, getInputProps }) => (
-            <section>
-              <div {...getRootProps()}>
+            <div>
+              <div
+                style={{
+                  width: 500,
+                  height: 550,
+                  backgroundColor: "#EFEFEF",
+                  margin: 10,
+                  borderRadius: 8,
+                  display: "flex",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  alignItems: "center"
+                }}
+                {...getRootProps()}
+              >
                 <input {...getInputProps()} />
-                <p>Drag 'n' drop some files here, or click to select files</p>
+                <Small>Drag and drop a file, or click to select files</Small>
               </div>
-            </section>
+            </div>
           )}
         </Dropzone>
-        {this.state.sharedDocuments && (
-          <FileViewer
-            fileType={"jpg"}
-            filePath={this.state.sharedDocuments[0].url}
-          />
-        )}
-        {this.state.sharedDocuments.map(d => (
-          <p>{d.url}</p>
-        ))}
-        <Bar>
-          <Col>
-            {this.state.localMediaAvailable && (
-              <SubHeader>
-                {this.context.isTutor
-                  ? this.state.tutor.firstName
-                  : this.state.client.firstName}
-              </SubHeader>
-            )}
-            <VideoContainer ref="localMedia" />
-          </Col>
-          <Col>
-            {this.state.remoteMediaAvailable && (
-              <SubHeader>
-                {this.context.isTutor
-                  ? this.state.client.firstName
-                  : this.state.tutor.firstName}
-              </SubHeader>
-            )}
-            <VideoContainer ref="remoteMedia" />
-          </Col>
-        </Bar>
+      )
+    });
+
+    return (
+      <div>
+        <SmallButton
+          style={{ position: "absolute", bottom: 10, left: 10 }}
+          onClick={this.leaveRoom}
+        >
+          <ButtonText>Leave Session</ButtonText>
+        </SmallButton>
+        <Row>
+          <RightColumn>
+            <Tab menu={{ secondary: true, pointing: true }} panes={documents} />
+            <Bar>
+              <Col>
+                {this.state.localMediaAvailable && (
+                  <SubHeader>
+                    {this.context.isTutor
+                      ? this.state.tutor.firstName
+                      : this.state.client.firstName}
+                  </SubHeader>
+                )}
+                <VideoContainer ref="localMedia" />
+              </Col>
+              <Col>
+                {this.state.remoteMediaAvailable && (
+                  <SubHeader>
+                    {this.context.isTutor
+                      ? this.state.client.firstName
+                      : this.state.tutor.firstName}
+                  </SubHeader>
+                )}
+                <VideoContainer ref="remoteMedia" />
+              </Col>
+            </Bar>
+          </RightColumn>
+        </Row>
       </div>
     );
   }
@@ -325,6 +378,11 @@ const VideoContainer = styled.div`
   > video {
     width: 240px;
   }
+`;
+
+const Scroll = styled.div`
+  height: 600px;
+  overflow-y: scroll;
 `;
 
 const Menu = styled.div`
@@ -346,6 +404,20 @@ const Bar = styled.div`
   position: absolute;
   bottom: 0;
   right: 0;
+`;
+
+const Row = styled.div`
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+`;
+
+const RightColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 40%;
+  min-width: 400px;
 `;
 
 const Col = styled.div`
