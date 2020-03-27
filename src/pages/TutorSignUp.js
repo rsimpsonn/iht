@@ -138,8 +138,8 @@ class TutorSignUp extends Component {
         lastName: this.state.lastName,
         year: this.state.selectedYear,
         birthDate: `${this.state.selectedMonth} ${this.state.day}, ${this.state.birthYear}`,
-        university: this.state.selectedUniversity,
-        major: this.state.selectedMajor,
+        universityID: this.state.selectedUniversity,
+        majorID: this.state.selectedMajor,
         answers: {
           subject: this.state.selectedSubjects,
           schedule: this.state.selectedSchedule

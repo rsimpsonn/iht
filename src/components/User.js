@@ -17,6 +17,7 @@ class User extends Component {
       .collection(this.props.isTutor ? "tutors" : "clients")
       .doc(this.props.id);
     const userDoc = await userRef.get();
+    console.log(userDoc.data());
 
     this.context.setUserDetails({ userDetails: userDoc.data() });
 

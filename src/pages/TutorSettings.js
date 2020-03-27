@@ -124,11 +124,18 @@ class TutorSettings extends Component {
   }
 
   async updateProfile() {
+    if (!this.state.lastName || !this.state.firstName) {
+      alert("You cannot have an empty first or last name");
+      return;
+    }
     let changedDetails = {
-      bio: this.state.bio,
       firstName: this.state.firstName,
       lastName: this.state.lastName
     };
+
+    if (this.state.bio) {
+      changedDetails.bio = this.state.bio;
+    }
 
     if (this.state.profilePicFile) {
       const url = await this.storeProfilePic();
