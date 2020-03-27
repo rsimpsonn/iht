@@ -19,6 +19,7 @@ import Settings from "./pages/Settings";
 import ForgotPassword from "./pages/ForgotPassword";
 import UserManagementForm from "./pages/UserManagementForm";
 import ClientSignUp from "./pages/ClientSignUp";
+import TutorSignUp from "./pages/TutorSignUp";
 
 import Toolbar from "./components/Toolbar";
 
@@ -129,6 +130,9 @@ function App() {
           <Router>
             <Toolbar />
             <Switch>
+              <Route path="/fortutors">
+                <TutorSignUp />
+              </Route>
               <Route path="/signup">
                 <ClientSignUp />
               </Route>

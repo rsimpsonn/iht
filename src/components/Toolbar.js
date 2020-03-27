@@ -28,12 +28,21 @@ function Toolbar(props) {
             <Header>
               <StyledLink to="/">Ivy Home Tutors</StyledLink>
             </Header>
-            {(context.user == null || !context.user.emailVerified) && (
-              <ListItem bold onClick={() => props.history.push("/signin")}>
-                Sign In
-              </ListItem>
+            {context.user == null && (
+              <Bar>
+                <ListItem
+                  style={{ marginRight: 25 }}
+                  bold
+                  onClick={() => props.history.push("/fortutors")}
+                >
+                  For Tutors
+                </ListItem>
+                <ListItem bold onClick={() => props.history.push("/signin")}>
+                  Sign In
+                </ListItem>
+              </Bar>
             )}
-            {context.user != null && context.user.emailVerified && (
+            {context.user != null && (
               <Bar>
                 <Icon onClick={() => props.history.push("/dashboard")}>
                   <AiOutlineHome style={{ margin: 5 }} size={25} />
@@ -111,12 +120,13 @@ const ListItem = styled.p`
   font-size: 15px;
   font-family: Lato;
   cursor: pointer;
+  margin: 0px;
 
   ${props =>
     props.bold &&
     `
     font-weight: Bold;
-    `}
+    `};
 `;
 
 const StyledLink = styled(Link)`

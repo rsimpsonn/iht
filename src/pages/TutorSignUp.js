@@ -2,18 +2,85 @@ import React, { Component } from "react";
 import styled from "styled-components";
 import { withRouter } from "react-router-dom";
 
+import { getAllUniversities } from "../universities";
+import { getAllMajors } from "../majors";
+
 import firebase from "../firebase";
 
 import { Checkbox, Divider, Dropdown } from "semantic-ui-react";
 
 import { SmallButton, ButtonText, Tiny, Header } from "../styles";
 
-class ClientSignUp extends Component {
+const monthOptions = [
+  {
+    text: "January",
+    value: 1,
+    key: 1
+  },
+  {
+    text: "February",
+    value: 2,
+    key: 2
+  },
+  {
+    text: "March",
+    value: 3,
+    key: 3
+  },
+  {
+    text: "April",
+    value: 4,
+    key: 4
+  },
+  {
+    text: "May",
+    value: 5,
+    key: 5
+  },
+  {
+    text: "June",
+    value: 6,
+    key: 6
+  },
+  {
+    text: "July",
+    value: 7,
+    key: 7
+  },
+  {
+    text: "August",
+    value: 8,
+    key: 8
+  },
+  {
+    text: "September",
+    value: 9,
+    key: 9
+  },
+  {
+    text: "October",
+    value: 10,
+    key: 10
+  },
+  {
+    text: "November",
+    value: 11,
+    key: 11
+  },
+  {
+    text: "December",
+    value: 12,
+    key: 12
+  }
+];
+
+class TutorSignUp extends Component {
   constructor(props) {
     super(props);
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.loadUniversities = this.loadUniversities.bind(this);
   }
 
   state = {
@@ -29,18 +96,35 @@ class ClientSignUp extends Component {
     });
   }
 
+  async loadUniversities() {
+    const universities = await getAllUniversities();
+
+    this.setState({
+      universities
+    });
+  }
+
+  async loadMajors() {
+    const majors = await getAllMajors();
+
+    this.setState({
+      majors
+    });
+  }
+
   async handleSubmit(e) {
     e.preventDefault();
 
     if (
-      this.state.studentFirstName &&
-      this.state.studentLastName &&
-      this.state.parentFirstName &&
-      this.state.parentLastName &&
-      this.state.parentEmail &&
-      this.state.grade &&
-      this.state.selectedSubjects &&
-      this.state.selectedSchedule &&
+      this.state.firstName &&
+      this.state.lastName &&
+      this.state.email &&
+      this.state.selectedYear &&
+      this.state.selectedUniversity &&
+      this.state.selectedMajor &&
+      this.state.selectedMonth &&
+      this.state.day &&
+      this.state.birthYear &&
       this.state.password &&
       this.state.confirm
     ) {
@@ -49,51 +133,21 @@ class ClientSignUp extends Component {
         return;
       }
 
-      let educationID = Math.floor(this.state.grade / 5);
-      if (this.state.grade === 9) {
-        educationID += 1;
-      }
-
-      if (this.state.grade === 5) {
-        educationID -= 1;
-      }
-
       let user = {
-        firstName: this.state.studentFirstName,
-        lastName: this.state.studentLastName,
-        grade: this.state.grade,
-        educationID: educationID,
-        parent: {
-          firstName: this.state.parentFirstName,
-          lastName: this.state.parentLastName
-        },
-        emailNotifications: [],
+        firstName: this.state.firstName,
+        lastName: this.state.lastName,
+        year: this.state.selectedYear,
+        birthDate: `${this.state.selectedMonth} ${this.state.day}, ${this.state.birthYear}`,
+        university: this.state.selectedUniversity,
+        major: this.state.selectedMajor,
         answers: {
           subject: this.state.selectedSubjects,
           schedule: this.state.selectedSchedule
         }
       };
 
-      if (this.state.parentReceivesNotifications) {
-        user.emailNotifications.push(this.state.parentEmail);
-      }
-
-      let primaryEmail = this.state.parentEmail;
-      if (this.state.studentEmail) {
-        if (this.state.primary === "student") {
-          primaryEmail = this.state.studentEmail;
-          user.parent.email = this.state.parentEmail;
-        } else {
-          user.studentEmail = this.state.studentEmail;
-        }
-
-        if (this.state.studentReceivesNotifications) {
-          user.emailNotifications.push(this.state.studentEmail);
-        }
-      }
-
       const signedUp = await firebase.auth.createUserWithEmailAndPassword(
-        primaryEmail,
+        this.state.email,
         this.state.password
       );
 
@@ -103,10 +157,10 @@ class ClientSignUp extends Component {
         firebase.db
           .collection("users")
           .doc(signedUp.user.uid)
-          .set({ isTutor: false });
+          .set({ isTutor: true });
 
         firebase.db
-          .collection("clients")
+          .collection("tutors")
           .doc(signedUp.user.uid)
           .set(user);
 
@@ -120,6 +174,53 @@ class ClientSignUp extends Component {
   }
 
   render() {
+    let universityOptions = [];
+
+    if (!this.state.universities) {
+      this.loadUniversities();
+    } else {
+      universityOptions = this.state.universities.map(u => {
+        return {
+          text: u.title,
+          value: u.id,
+          key: u.id
+        };
+      });
+    }
+
+    let majorOptions = [];
+
+    if (!this.state.majors) {
+      this.loadMajors();
+    } else {
+      majorOptions = this.state.majors.map(m => {
+        return {
+          text: m.title,
+          value: m.id,
+          key: m.id
+        };
+      });
+    }
+
+    const now = new Date();
+
+    let additions = [];
+
+    if (now.getMonth() > 4) {
+      additions = [1, 2, 3, 4];
+    } else {
+      additions = [0, 1, 2, 3];
+    }
+
+    const yearOptions = additions.map(a => {
+      const year = now.getFullYear() + a;
+      return {
+        key: a,
+        text: year,
+        value: year
+      };
+    });
+
     const scheduleOptions = [
       {
         text: "Less than once per month",
@@ -161,132 +262,118 @@ class ClientSignUp extends Component {
       }
     ];
 
-    const gradeOptions = [12, 11, 10, 9, 8, 7, 6].map(g => {
-      return {
-        text: g,
-        value: g,
-        key: g
-      };
-    });
-
     return (
       <Center>
         <Container>
           <Header margin>Sign Up</Header>
           <form onSubmit={this.handleSubmit}>
             <Tiny>
-              Student Name{" "}
-              <span style={{ fontWeight: "Bold", color: "black" }}>*</span>
+              Name <span style={{ fontWeight: "Bold", color: "black" }}>*</span>
             </Tiny>
             <Row>
               <GrayLine style={{ width: "60%", marginRight: 15 }}>
                 <NiceInput
                   placeholder="First Name"
-                  name="studentFirstName"
+                  name="firstName"
                   onChange={this.handleChange}
                 />
               </GrayLine>
               <GrayLine>
                 <NiceInput
                   placeholder="Last Name"
-                  name="studentLastName"
+                  name="lastName"
                   onChange={this.handleChange}
                 />
               </GrayLine>
             </Row>
-            <Tiny>Student Email</Tiny>
+            <Tiny>
+              Email{" "}
+              <span style={{ fontWeight: "Bold", color: "black" }}>*</span>
+            </Tiny>
             <GrayLine>
               <NiceInput
-                placeholder="Student Email"
-                name="studentEmail"
+                placeholder="School Email"
+                name="email"
                 onChange={this.handleChange}
               />
             </GrayLine>
-            {this.state.studentEmail && (
-              <div>
-                <Checkbox
-                  radio
-                  label="Use as primary account email"
-                  name="primary"
-                  value="student"
-                  checked={this.state.primary === "student"}
-                  onChange={(e, { value }) => this.setState({ primary: value })}
-                />
-                <br />
-                <br />
-                <Checkbox
-                  label="Receive email notifications"
-                  checked={this.state.studentReceivesNotifications}
-                  onChange={(e, { value }) =>
-                    this.setState({ studentReceivesNotifications: value })
+            <Tiny>
+              Date of birth{" "}
+              <span style={{ fontWeight: "Bold", color: "black" }}>*</span>
+            </Tiny>
+            <Row>
+              <GrayLine style={{ marginRight: 20 }}>
+                <Dropdown
+                  placeholder="Month"
+                  options={monthOptions}
+                  onChange={(e, data) =>
+                    this.setState({ selectedMonth: data.value })
                   }
                 />
-              </div>
-            )}
-            <Tiny>
-              Grade{" "}
-              <span style={{ fontWeight: "Bold", color: "black" }}>*</span>
-            </Tiny>
-            <GrayLine style={{ width: "25%" }}>
-              <Dropdown
-                placeholder="Grade"
-                options={gradeOptions}
-                onChange={(e, data) => this.setState({ grade: data.value })}
-              />
-            </GrayLine>
-            <Divider />
-            <Tiny>
-              Guardian Name{" "}
-              <span style={{ fontWeight: "Bold", color: "black" }}>*</span>
-            </Tiny>
-            <Row>
-              <GrayLine style={{ width: "60%", marginRight: 15 }}>
-                <NiceInput
-                  placeholder="First Name"
-                  name="parentFirstName"
-                  onChange={this.handleChange}
-                />
               </GrayLine>
               <GrayLine>
                 <NiceInput
-                  placeholder="Last Name"
-                  name="parentLastName"
+                  placeholder="Day"
+                  name="day"
+                  onChange={this.handleChange}
+                />
+              </GrayLine>
+              <GrayLine style={{ marginLeft: 20 }}>
+                <NiceInput
+                  placeholder="Year"
+                  name="birthYear"
                   onChange={this.handleChange}
                 />
               </GrayLine>
             </Row>
+            <Divider />
+            <Row>
+              <div style={{ marginRight: 20, minWidth: 160 }}>
+                <Tiny>
+                  University{" "}
+                  <span style={{ fontWeight: "Bold", color: "black" }}>*</span>
+                </Tiny>
+                <GrayLine>
+                  <Dropdown
+                    options={universityOptions}
+                    placeholder="University"
+                    scrolling
+                    onChange={(e, data) =>
+                      this.setState({ selectedUniversity: data.value })
+                    }
+                  />
+                </GrayLine>
+              </div>
+              <div style={{ minWidth: 140 }}>
+                <Tiny>
+                  Major{" "}
+                  <span style={{ fontWeight: "Bold", color: "black" }}>*</span>
+                </Tiny>
+                <GrayLine>
+                  <Dropdown
+                    options={majorOptions}
+                    placeholder="Major"
+                    scrolling
+                    onChange={(e, data) =>
+                      this.setState({ selectedMajor: data.value })
+                    }
+                  />
+                </GrayLine>
+              </div>
+            </Row>
             <Tiny>
-              Guardian Email{" "}
-              <span style={{ fontWeight: "Bold", color: "black" }}>*</span>
+              Year <span style={{ fontWeight: "Bold", color: "black" }}>*</span>
             </Tiny>
-            <GrayLine>
-              <NiceInput
-                placeholder="Parent Email"
-                name="parentEmail"
-                onChange={this.handleChange}
+            <GrayLine style={{ width: 80 }}>
+              <Dropdown
+                options={yearOptions}
+                placeholder="Year"
+                scrolling
+                onChange={(e, data) =>
+                  this.setState({ selectedYear: data.value })
+                }
               />
             </GrayLine>
-            {this.state.studentEmail && (
-              <div>
-                <Checkbox
-                  radio
-                  label="Use as primary account email"
-                  name="primary"
-                  value="parent"
-                  checked={this.state.primary === "parent"}
-                  onChange={(e, { value }) => this.setState({ primary: value })}
-                />
-                <br />
-                <br />
-              </div>
-            )}
-            <Checkbox
-              label="Receive email notifications"
-              checked={this.state.parentReceivesNotifications}
-              onChange={(e, { value }) =>
-                this.setState({ parentReceivesNotifications: value })
-              }
-            />
             <Divider />
             <Tiny>
               Password{" "}
@@ -314,7 +401,7 @@ class ClientSignUp extends Component {
             </GrayLine>
             <Divider />
             <Tiny>
-              How often do you expect to schedule tutoring?{" "}
+              How often would you like to tutor?{" "}
               <span style={{ fontWeight: "Bold", color: "black" }}>*</span>
             </Tiny>
             <GrayLine>
@@ -327,7 +414,7 @@ class ClientSignUp extends Component {
               />
             </GrayLine>
             <Tiny>
-              What subjects do you expect to schedule tutoring for?{" "}
+              What subjects would you like to tutor?{" "}
               <span style={{ fontWeight: "Bold", color: "black" }}>*</span>
             </Tiny>
             <Dropdown
@@ -388,4 +475,4 @@ const Row = styled.div`
   flex-direction: row;
 `;
 
-export default withRouter(ClientSignUp);
+export default withRouter(TutorSignUp);
