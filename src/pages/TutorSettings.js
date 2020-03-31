@@ -39,15 +39,13 @@ class TutorSettings extends Component {
   static contextType = userDetailsContext;
 
   async getCollege() {
-    const college = await getUniversity(
-      this.context.userDetails.userDetails.universityID
-    );
+    const college = await getUniversity(this.context.userDetails.universityID);
 
     this.setState({ college });
   }
 
   async getMajor() {
-    const major = await getMajor(this.context.userDetails.userDetails.majorID);
+    const major = await getMajor(this.context.userDetails.majorID);
 
     this.setState({ major });
   }
@@ -161,15 +159,15 @@ class TutorSettings extends Component {
   }
 
   render() {
-    if (this.context.userDetails.userDetails && !this.state.college) {
+    if (this.context.userDetails && !this.state.college) {
       this.getCollege();
     }
 
-    if (this.context.userDetails.userDetails && !this.state.major) {
+    if (this.context.userDetails && !this.state.major) {
       this.getMajor();
     }
 
-    if (this.context.userDetails.userDetails && !this.state.allSubjects) {
+    if (this.context.userDetails && !this.state.allSubjects) {
       this.getAllSubjects();
     }
 
@@ -215,19 +213,17 @@ class TutorSettings extends Component {
         <Main>
           <Card>
             <Header margin>User Profile</Header>
-            {this.context.userDetails.userDetails ? (
+            {this.context.userDetails ? (
               <Row>
                 {!this.state.editingProfile && (
-                  <Circle
-                    image={this.context.userDetails.userDetails.profilePic}
-                  />
+                  <Circle image={this.context.userDetails.profilePic} />
                 )}
                 {this.state.editingProfile && (
                   <Circle
                     image={
                       this.state.profilePicFile
                         ? URL.createObjectURL(this.state.profilePicFile)
-                        : this.context.userDetails.userDetails.profilePic
+                        : this.context.userDetails.profilePic
                     }
                   >
                     <input
@@ -247,7 +243,7 @@ class TutorSettings extends Component {
                       <Small>First Name</Small>
                       {!this.state.editingProfile && (
                         <SubHeader>
-                          {this.context.userDetails.userDetails.firstName}
+                          {this.context.userDetails.firstName}
                         </SubHeader>
                       )}
                       {this.state.editingProfile && (
@@ -262,7 +258,7 @@ class TutorSettings extends Component {
                       <Small>Last Name</Small>
                       {!this.state.editingProfile && (
                         <SubHeader>
-                          {this.context.userDetails.userDetails.lastName}
+                          {this.context.userDetails.lastName}
                         </SubHeader>
                       )}
                       {this.state.editingProfile && (
@@ -276,9 +272,7 @@ class TutorSettings extends Component {
                   </Row>
                   <Small>Bio</Small>
                   {!this.state.editingProfile && (
-                    <SubHeader>
-                      {this.context.userDetails.userDetails.bio}
-                    </SubHeader>
+                    <SubHeader>{this.context.userDetails.bio}</SubHeader>
                   )}
                   {this.state.editingProfile && (
                     <NiceArea
@@ -303,9 +297,9 @@ class TutorSettings extends Component {
                 onClick={() =>
                   this.setState({
                     editingProfile: !this.state.editingProfile,
-                    bio: this.context.userDetails.userDetails.bio,
-                    firstName: this.context.userDetails.userDetails.firstName,
-                    lastName: this.context.userDetails.userDetails.lastName
+                    bio: this.context.userDetails.bio,
+                    firstName: this.context.userDetails.firstName,
+                    lastName: this.context.userDetails.lastName
                   })
                 }
                 color={this.state.editingProfile ? "#585EE6" : false}
@@ -316,7 +310,7 @@ class TutorSettings extends Component {
           </Card>
           <Card>
             <Header margin>Education</Header>
-            {this.context.userDetails.userDetails ? (
+            {this.context.userDetails ? (
               <Row>
                 <div style={{ margin: 10 }}>
                   <Row>
@@ -328,9 +322,7 @@ class TutorSettings extends Component {
                     </div>
                     <div>
                       <Small>Year</Small>
-                      <SubHeader>
-                        {this.context.userDetails.userDetails.year}
-                      </SubHeader>
+                      <SubHeader>{this.context.userDetails.year}</SubHeader>
                     </div>
                   </Row>
                   <Small>Major</Small>
@@ -361,7 +353,7 @@ class TutorSettings extends Component {
         </Main>
         <Card>
           <Header margin>Subject Preferences</Header>
-          {this.context.userDetails.userDetails ? (
+          {this.context.userDetails ? (
             <div>
               <Small margin>Elementary school preferences</Small>
               <Dropdown
@@ -372,9 +364,7 @@ class TutorSettings extends Component {
                 scrolling
                 options={elementaryOptions}
                 loading={!this.state.allSubjects}
-                defaultValue={
-                  this.context.userDetails.userDetails.elementaryPref
-                }
+                defaultValue={this.context.userDetails.elementaryPref}
                 onChange={(e, { value }) =>
                   this.setState({ elementaryPref: value })
                 }
@@ -388,7 +378,7 @@ class TutorSettings extends Component {
                 scrolling
                 options={middleOptions}
                 loading={!this.state.allSubjects}
-                defaultValue={this.context.userDetails.userDetails.middlePref}
+                defaultValue={this.context.userDetails.middlePref}
                 onChange={(e, { value }) =>
                   this.setState({ middlePref: value })
                 }
@@ -403,7 +393,7 @@ class TutorSettings extends Component {
                 options={highOptions}
                 loading={!this.state.allSubjects}
                 onChange={(e, { value }) => this.setState({ highPref: value })}
-                defaultValue={this.context.userDetails.userDetails.highPref}
+                defaultValue={this.context.userDetails.highPref}
               />
               <Divider />
               {this.newPreferences() && (

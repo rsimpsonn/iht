@@ -6,14 +6,18 @@ import { smallDayMonthDateFullTime } from "../timeFormatter";
 
 import styled from "styled-components";
 import getSubject from "../subjects";
+import getMajor from "../majors";
 
 import firebase from "../firebase";
 import {
   AiFillStar,
   AiOutlineCalendar,
-  AiOutlineClockCircle,
-  AiOutlineStar
+  AiOutlineStar,
+  AiOutlineBank,
+  AiOutlineBook
 } from "react-icons/ai";
+
+import { MdStar, MdStarHalf, MdStarBorder } from "react-icons/md";
 import { SubHeader, Small, Tiny, SmallButton, ButtonText } from "../styles";
 import getUniversity from "../universities";
 
@@ -23,6 +27,8 @@ class ScheduleSession extends Component {
 
     this.requestSession = this.requestSession.bind(this);
     this.setFavorite = this.setFavorite.bind(this);
+    this.loadUniversity = this.loadUniversity.bind(this);
+    this.loadMajor = this.loadMajor.bind(this);
   }
 
   state = {
@@ -33,38 +39,42 @@ class ScheduleSession extends Component {
 
   async componentDidMount() {
     this.setState({
-      favorite: this.props.favorite
+      favorite: this.props.favorite,
+      frontSide: !this.props.bio,
+      university: this.props.university ? this.props.university : "",
+      major: this.props.major ? this.props.major : ""
     });
-    let prefType = "";
-    const university = await getUniversity(this.props.tutor.universityID);
+    const prefs = ["elementaryPref", "middlePref", "highPref"];
+    const prefType = prefs[parseInt(this.props.client.educationID)];
 
-    switch (this.props.client.educationID) {
-      case "0":
-        prefType = "elementaryPref";
-      case "1":
-        prefType = "middlePref";
-      case "2":
-        prefType = "highPref";
-      case "3":
-        prefType = "collegePref";
-      default:
-        prefType = "elementaryPref";
-    }
+    console.log(prefType);
 
     if (this.props.tutor[prefType]) {
       Promise.all(this.props.tutor[prefType].map(f => getSubject(f))).then(
         subjectsAvailable => this.setState({ subjectsAvailable })
       );
     }
-
-    this.setState({
-      university: university
-    });
   }
 
   setFavorite() {
     this.setState({
       favorite: !this.state.favorite
+    });
+  }
+
+  async loadUniversity() {
+    const university = await getUniversity(this.props.tutor.universityID);
+
+    this.setState({
+      university
+    });
+  }
+
+  async loadMajor() {
+    const major = await getMajor(this.props.tutor.majorID);
+
+    this.setState({
+      major
     });
   }
 
@@ -103,6 +113,22 @@ class ScheduleSession extends Component {
   }
 
   render() {
+    let university = "";
+
+    if (this.state.university) {
+      university = this.state.university.title;
+    } else {
+      this.loadUniversity();
+    }
+
+    let major = "";
+
+    if (this.state.major) {
+      major = this.state.major.title;
+    } else {
+      this.loadMajor();
+    }
+
     const subjectOptions = this.state.subjectsAvailable.map(s => {
       return {
         key: s.id,
@@ -119,10 +145,35 @@ class ScheduleSession extends Component {
         (s.end.getHours() % 12 === 0 ? 12 : s.end.getHours() % 12)
       : "Select Time";
 
+    let stars = [];
+
+    for (let i = 1; i < 6; i++) {
+      const diff = this.props.tutor.rating - i;
+
+      if (diff > -0.2) {
+        stars.push(<MdStar size={12} color="#09AA82" />);
+      } else if (diff > -0.65) {
+        stars.push(<MdStarHalf size={12} color="#09AA82" />);
+      } else {
+        stars.push(<MdStarBorder size={12} color="#09AA82" />);
+      }
+    }
+
     return (
       <Box>
         <Menu>
-          <SubHeader>{this.props.tutor.firstName}</SubHeader>
+          <div>
+            <SubHeader>{this.props.tutor.firstName}</SubHeader>
+            {this.props.tutor.sessions > 0 && (
+              <Row>
+                {stars}{" "}
+                <Tiny style={{ marginLeft: 6 }}>
+                  ({this.props.tutor.sessions})
+                </Tiny>
+              </Row>
+            )}
+            {this.props.tutor.sessions === 0 && <Tiny>New tutor</Tiny>}
+          </div>
           <Bar>
             {this.state.favorite && (
               <BetterStar
@@ -143,11 +194,25 @@ class ScheduleSession extends Component {
               />
             )}
             {!this.state.frontSide && (
-              <Circle src={this.props.tutor.profilePic} />
+              <Circle image={this.props.tutor.profilePic}>
+                {!this.props.tutor.profilePic && (
+                  <SubHeader color="white">
+                    {this.props.tutor.firstName.substring(0, 1)}
+                  </SubHeader>
+                )}
+              </Circle>
             )}
             {this.state.frontSide && (
               <Popup
-                trigger={<Circle src={this.props.tutor.profilePic} />}
+                trigger={
+                  <Circle image={this.props.tutor.profilePic}>
+                    {!this.props.tutor.profilePic && (
+                      <SubHeader color="white">
+                        {this.props.tutor.firstName.substring(0, 1)}
+                      </SubHeader>
+                    )}
+                  </Circle>
+                }
                 position="top center"
                 flowing
                 hoverable
@@ -218,28 +283,33 @@ class ScheduleSession extends Component {
         )}
         {!this.state.frontSide && (
           <div>
-            <p>
-              {this.props.tutor.year} {","} {this.state.university.title}
-            </p>
-            <p>{"Studying" + " " + this.props.tutor.majorID}</p>
-            <p>{this.props.tutor.bio}</p>
-
-            <Menu>
-              <BetterStar size={25} favorite={this.props.favorite} />
-              <BetterStar size={25} favorite={this.props.favorite} />
-              <BetterStar size={25} favorite={this.props.favorite} />
-              <BetterStar size={25} favorite={this.props.favorite} />
-              <BetterStar size={25} favorite={this.props.favorite} />
-
-              <SmallButton
-                onClick={() =>
-                  this.setState({ frontSide: !this.state.frontSide })
-                }
-              >
-                <ButtonText>Schedule</ButtonText>
-              </SmallButton>
-            </Menu>
-            <p>{this.props.tutor.sessions + " sessions"}</p>
+            {this.props.tutor.bio && (
+              <div style={{ marginBottom: 10 }}>
+                <Tiny>Bio</Tiny>
+                <Small color="black">{this.props.tutor.bio}</Small>
+              </div>
+            )}
+            {university && (
+              <Tiny>
+                <AiOutlineBank size={14} /> {university}
+              </Tiny>
+            )}
+            {major && (
+              <Tiny>
+                <AiOutlineBook size={14} /> {major}
+              </Tiny>
+            )}
+            <Tiny>
+              <AiOutlineCalendar size={14} /> Graduating {this.props.tutor.year}
+            </Tiny>
+            <Divider />
+            <SmallButton
+              onClick={() =>
+                this.setState({ frontSide: !this.state.frontSide })
+              }
+            >
+              <ButtonText>Schedule</ButtonText>
+            </SmallButton>
           </div>
         )}
       </Box>
@@ -265,12 +335,6 @@ const BetterOutlineStar = styled(AiOutlineStar)`
   &:hover {
     transform: scale(1.1);
   }
-`;
-
-const Circle = styled.img`
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
 `;
 
 const Box = styled.div`
@@ -312,6 +376,24 @@ const Info = styled.p`
   &:hover {
     transform: scale(1.1);
   }
+`;
+
+const Circle = styled.div`
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  background-color: #09aa82;
+  background-size: contain;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-position: center;
+  background-repeat: "no-repeat";
+
+  ${props =>
+    props.image &&
+    `
+      background-image: url(${props.image})`}
 `;
 
 export default ScheduleSession;

@@ -5,6 +5,7 @@ import styled from "styled-components";
 
 import firebase from "../firebase";
 import ScheduleSession from "./ScheduleSession";
+import SearchTutors from "./SearchTutors";
 
 import getTutor from "../tutors";
 
@@ -134,7 +135,7 @@ class ScheduleSessions extends Component {
         menuItem: "Search for Tutors",
         render: () => (
           <Bar>
-            <SubHeader cursor="pointer">Search for tutors</SubHeader>
+            <SearchTutors />
           </Bar>
         )
       }

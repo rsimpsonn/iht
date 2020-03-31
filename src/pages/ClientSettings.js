@@ -40,9 +40,7 @@ class ClientSettings extends Component {
   }
 
   async getEduLevel() {
-    const eduLevel = await getEduLevel(
-      this.context.userDetails.userDetails.educationID
-    );
+    const eduLevel = await getEduLevel(this.context.userDetails.educationID);
 
     this.setState({
       eduLevel
@@ -80,14 +78,11 @@ class ClientSettings extends Component {
   }
 
   render() {
-    if (
-      this.context.userDetails.userDetails &&
-      !this.state.allEducationLevels
-    ) {
+    if (this.context.userDetails && !this.state.allEducationLevels) {
       this.getAllEducationLevels();
     }
 
-    if (this.context.userDetails.userDetails && !this.state.eduLevel) {
+    if (this.context.userDetails && !this.state.eduLevel) {
       this.getEduLevel();
     }
 
@@ -107,7 +102,7 @@ class ClientSettings extends Component {
         <Main>
           <Card>
             <Header margin>User Profile</Header>
-            {this.context.userDetails.userDetails ? (
+            {this.context.userDetails ? (
               <Row>
                 <div style={{ margin: 10 }}>
                   <Row>
@@ -115,7 +110,7 @@ class ClientSettings extends Component {
                       <Small>First Name</Small>
                       {!this.state.editingProfile && (
                         <SubHeader>
-                          {this.context.userDetails.userDetails.firstName}
+                          {this.context.userDetails.firstName}
                         </SubHeader>
                       )}
                       {this.state.editingProfile && (
@@ -132,7 +127,7 @@ class ClientSettings extends Component {
                       <Small>Last Name</Small>
                       {!this.state.editingProfile && (
                         <SubHeader>
-                          {this.context.userDetails.userDetails.lastName}
+                          {this.context.userDetails.lastName}
                         </SubHeader>
                       )}
                       {this.state.editingProfile && (
@@ -148,9 +143,7 @@ class ClientSettings extends Component {
                   </Row>
                   <div>
                     <Small>
-                      {this.context.userDetails.userDetails.parent
-                        ? "Child's "
-                        : ""}{" "}
+                      {this.context.userDetails.parent ? "Child's " : ""}{" "}
                       Education Level
                     </Small>
                     {!this.state.editingProfile && (
@@ -188,8 +181,8 @@ class ClientSettings extends Component {
                 onClick={() =>
                   this.setState({
                     editingProfile: !this.state.editingProfile,
-                    firstName: this.context.userDetails.userDetails.firstName,
-                    lastName: this.context.userDetails.userDetails.lastName
+                    firstName: this.context.userDetails.firstName,
+                    lastName: this.context.userDetails.lastName
                   })
                 }
                 color={this.state.editingProfile ? "#585EE6" : false}

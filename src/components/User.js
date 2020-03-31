@@ -19,7 +19,7 @@ class User extends Component {
     const userDoc = await userRef.get();
     console.log(userDoc.data());
 
-    this.context.setUserDetails({ userDetails: userDoc.data() });
+    this.context.setUserDetails({ id: this.props.id, ...userDoc.data() });
 
     this.setState({
       userDetails: userDoc.data()

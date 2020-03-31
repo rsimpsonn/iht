@@ -12,12 +12,13 @@ import { withRouter } from "react-router-dom";
 import Alerts from "./Alerts";
 import User from "./User";
 import EmailNotVerified from "./EmailNotVerified";
-
 import {
   AiOutlineBell,
   AiOutlineCalendar,
   AiOutlineHome
 } from "react-icons/ai";
+
+import fullLogo from "../images/ivybase.png";
 
 function Toolbar(props) {
   return (
@@ -25,9 +26,11 @@ function Toolbar(props) {
       {context => (
         <div>
           <Menu>
-            <Header>
-              <StyledLink to="/">Ivy Home Tutors</StyledLink>
-            </Header>
+            <Logo
+              onClick={() => props.history.push("/")}
+              src={fullLogo}
+              style={{ width: "10%", height: "auto" }}
+            />
             {context.user == null && (
               <Bar>
                 <ListItem
@@ -37,9 +40,23 @@ function Toolbar(props) {
                 >
                   For Tutors
                 </ListItem>
-                <ListItem bold onClick={() => props.history.push("/signin")}>
+                <ListItem
+                  style={{ marginRight: 25 }}
+                  bold
+                  onClick={() => props.history.push("/signin")}
+                >
                   Sign In
                 </ListItem>
+                <SignUpButton>
+                  <ListItem
+                    white
+                    bold
+                    onClick={() => props.history.push("/signup")}
+                    style={{ backgroundColor: "" }}
+                  >
+                    Sign Up
+                  </ListItem>
+                </SignUpButton>
               </Bar>
             )}
             {context.user != null && (
@@ -94,6 +111,16 @@ function Toolbar(props) {
   );
 }
 
+const SignUpButton = styled.div`
+  background-color: #09aa82;
+  padding: 10px;
+  border-radius: 6px;
+`;
+
+const Logo = styled.img`
+  cursor: pointer;
+`;
+
 const Bar = styled.div`
   display: flex;
   flex-direction: row;
@@ -107,7 +134,7 @@ const Menu = styled.div`
   width: 100%;
   justify-content: space-between;
   align-items: center;
-  padding: 2% 2% 0;
+  padding: 1.4% 2% 0;
 `;
 
 const Header = styled.p`
@@ -127,6 +154,18 @@ const ListItem = styled.p`
     `
     font-weight: Bold;
     `};
+
+  ${props =>
+    props.bold &&
+    `
+      font-weight: Bold;
+      `};
+
+  ${props =>
+    props.white &&
+    `
+        color: white;
+        `};
 `;
 
 const StyledLink = styled(Link)`
