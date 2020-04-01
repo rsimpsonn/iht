@@ -215,28 +215,30 @@ class TutorSettings extends Component {
             <Header margin>User Profile</Header>
             {this.context.userDetails ? (
               <Row>
-                {!this.state.editingProfile && (
+                {(!this.state.editingProfile ||
+                  this.context.userDetails.profilePic) && (
                   <Circle image={this.context.userDetails.profilePic} />
                 )}
-                {this.state.editingProfile && (
-                  <Circle
-                    image={
-                      this.state.profilePicFile
-                        ? URL.createObjectURL(this.state.profilePicFile)
-                        : this.context.userDetails.profilePic
-                    }
-                  >
-                    <input
-                      type="file"
-                      accept="image/*"
-                      id="file"
-                      onChange={e =>
-                        this.setState({ profilePicFile: e.target.files[0] })
+                {this.state.editingProfile &&
+                  !this.context.userDetails.profilePic && (
+                    <Circle
+                      image={
+                        this.state.profilePicFile
+                          ? URL.createObjectURL(this.state.profilePicFile)
+                          : this.context.userDetails.profilePic
                       }
-                    />
-                    <label for="file">+</label>
-                  </Circle>
-                )}
+                    >
+                      <input
+                        type="file"
+                        accept="image/*"
+                        id="file"
+                        onChange={e =>
+                          this.setState({ profilePicFile: e.target.files[0] })
+                        }
+                      />
+                      <label for="file">+</label>
+                    </Circle>
+                  )}
                 <div style={{ margin: 10 }}>
                   <Row>
                     <div style={{ width: 120 }}>

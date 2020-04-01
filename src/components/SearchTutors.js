@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import styled from "styled-components";
 
-import { Dropdown, Divider } from "semantic-ui-react";
+import { Dropdown, Divider, Loader } from "semantic-ui-react";
 
 import ScheduleSession from "./ScheduleSession";
 
@@ -317,7 +317,7 @@ class SearchTutors extends Component {
             ))}
           </Scroll>
         )}
-        {this.state.loading && <SubHeader>Loading</SubHeader>}
+        {this.state.loading && <Loader active>Loading</Loader>}
       </div>
     );
   }

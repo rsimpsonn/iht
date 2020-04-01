@@ -6,6 +6,7 @@ import { Divider } from "semantic-ui-react";
 import firebase from "../firebase";
 import userContext from "../contexts/userContext";
 
+import Checklist from "../components/Checklist";
 import UpcomingSessions from "../components/UpcomingSessions";
 import RequestedSessions from "../components/RequestedSessions";
 import PastSessions from "../components/PastSessions";
@@ -62,6 +63,7 @@ class TutorDashboard extends Component {
 
     return (
       <div>
+        <Checklist />
         <UpcomingSessions sessions={upcomingSessions} />
         {upcomingSessions.length > 0 && <Divider />}
         <RequestedSessions sessions={requestedSessions} />

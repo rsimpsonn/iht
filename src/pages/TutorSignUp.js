@@ -133,6 +133,25 @@ class TutorSignUp extends Component {
         return;
       }
 
+      const a = this.state.email.indexOf("@");
+
+      if (a === -1) {
+        alert("Please enter a valid school email");
+        return;
+      } else {
+        const after = this.state.email.substring(a + 1);
+        const selectedUniversity = this.state.universities.find(
+          i => i.id === this.state.selectedUniversity
+        );
+        if (selectedUniversity.slugs.filter(i => i === after).length === 0) {
+          alert(
+            "Please enter a valid school email for the school you have selected: " +
+              selectedUniversity.title
+          );
+          return;
+        }
+      }
+
       let user = {
         firstName: this.state.firstName,
         lastName: this.state.lastName,
@@ -143,7 +162,10 @@ class TutorSignUp extends Component {
         answers: {
           subject: this.state.selectedSubjects,
           schedule: this.state.selectedSchedule
-        }
+        },
+        sessions: 0,
+        rating: 0,
+        verified: false
       };
 
       const signedUp = await firebase.auth.createUserWithEmailAndPassword(

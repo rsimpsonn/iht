@@ -6,6 +6,16 @@ admin.initializeApp();
 const db = admin.firestore();
 
 const stripe = require("stripe")(functions.config().stripe.token);
+const nodemailer = require("nodemailer");
+const cors = require("cors")({ origin: true });
+
+let transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: "ivybasetutors@gmail.com",
+    pass: functions.config().gmail.password
+  }
+});
 
 /*exports.getStripeCustomer = functions.http.onCall(async (data, context) => {
   const uid = context.auth.uid;
@@ -29,6 +39,56 @@ const stripe = require("stripe")(functions.config().stripe.token);
     customer
   };
 });*/
+
+exports.emailNotifications = functions.firestore
+  .document("alerts/{newAlert}")
+  .onCreate(async (snap, context) => {
+    const alert = snap.data();
+
+    if (alert.mail) {
+      const userType = await db.doc("users/" + alert.to).get();
+      const user = userType.data();
+
+      let emails = [];
+
+      const userData = await admin.auth().getUser(alert.to);
+      emails.push(userData.email);
+
+      if (!user.isTutor) {
+        const clientData = await db.doc("clients/" + alert.to).get();
+        const client = clientData.data();
+
+        if (client.emailNotifications) {
+          emails = emails.concat(client.emailNotifications);
+        }
+      }
+
+      emails.forEach(async e => {
+        let html = `<img style="width: 100px; height: auto" src="https://firebasestorage.googleapis.com/v0/b/ivyhometutors.appspot.com/o/ivybase.png?alt=media&token=8a0deb2b-90d5-44f4-842e-f047390e294c" />
+        <br />
+        <p>${alert.description}</p>
+        `;
+
+        if (alert.actionType === "link") {
+          html += `<a href="${alert.url}">${alert.actionText}</a>`;
+        }
+
+        const mailOptions = {
+          from: "ivybase Tutors <ivybasetutors@gmail.com>",
+          to: e,
+          subject: alert.message,
+          html
+        };
+
+        const info = await transporter.sendMail(mailOptions);
+
+        console.log(info);
+
+        console.log("Message sent: %s", info.messageId);
+        // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+      });
+    }
+  });
 
 exports.createIntent = functions.firestore
   .document("stripe_customers/{userId}/intents/{newIntent}")
