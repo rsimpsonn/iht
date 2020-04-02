@@ -61,7 +61,7 @@ class ScheduleSessions extends Component {
       if (recents.filter(c => c.id === t.id).length === 0) {
         recents.push({
           favorite:
-            this.props.client.favorites ||
+            this.props.client.favorites &&
             this.props.client.favorites.filter(e => e.id === t.id).length === 1,
           ...t
         });

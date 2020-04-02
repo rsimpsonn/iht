@@ -68,6 +68,7 @@ const AlertBar = styled.div`
   width: 100%;
   display: flex;
   flex-direction: row;
+  margin-top: 20px;
 `;
 
 const TopMargin = styled.div`

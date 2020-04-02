@@ -107,7 +107,8 @@ class ScheduleSession extends Component {
         end: this.state.selectedTimeSlot.end,
         status: "Requested",
         subjectID: this.state.selectedSubject,
-        tutor: this.props.tutor.id
+        tutor: this.props.tutor.id,
+        recurring: this.state.recurring
       });
     }
   }
@@ -158,6 +159,19 @@ class ScheduleSession extends Component {
         stars.push(<MdStarBorder size={12} color="#09AA82" />);
       }
     }
+
+    const recurringOptions = [
+      {
+        key: 0,
+        value: 0,
+        text: "One time"
+      },
+      {
+        key: 1,
+        value: 1,
+        text: "Weekly"
+      }
+    ];
 
     return (
       <Box>
@@ -275,6 +289,16 @@ class ScheduleSession extends Component {
                 }
               />
             </Popup>
+            <Dropdown
+              defaultValue={0}
+              style={{ margin: "10px 0" }}
+              fluid
+              selection
+              options={recurringOptions}
+              onChange={(e, data) =>
+                this.setState({ recurring: data.value === 1 })
+              }
+            />
             <Divider />
             <SmallButton onClick={this.requestSession}>
               <ButtonText>Request Session</ButtonText>
@@ -342,7 +366,7 @@ const Box = styled.div`
   border-radius: 8px;
   margin: 0 15px;
   padding: 15px;
-  min-width: 17.5%;
+  min-width: 240px;
   width: 17.5%;
 `;
 

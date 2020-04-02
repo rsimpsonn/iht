@@ -20,8 +20,9 @@ class AvailableTimes extends Component {
 
   async componentDidMount() {
     const availRef = firebase.db
-      .collection("opentimeslots")
-      .where("uid", "==", this.props.tutor.id);
+      .collection("tutors")
+      .doc(this.props.tutor.id)
+      .collection("opentimeslots");
 
     const snapshot = await availRef.get();
 

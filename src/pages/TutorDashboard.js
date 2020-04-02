@@ -10,6 +10,7 @@ import Checklist from "../components/Checklist";
 import UpcomingSessions from "../components/UpcomingSessions";
 import RequestedSessions from "../components/RequestedSessions";
 import PastSessions from "../components/PastSessions";
+import ConfirmAvailability from "../components/ConfirmAvailability";
 
 class TutorDashboard extends Component {
   state = { alert: false, sessions: [] };
@@ -64,6 +65,7 @@ class TutorDashboard extends Component {
     return (
       <div>
         <Checklist />
+        <ConfirmAvailability />
         <UpcomingSessions sessions={upcomingSessions} />
         {upcomingSessions.length > 0 && <Divider />}
         <RequestedSessions sessions={requestedSessions} />

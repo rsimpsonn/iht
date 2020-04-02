@@ -62,7 +62,7 @@ class ClientSignUp extends Component {
         firstName: this.state.studentFirstName,
         lastName: this.state.studentLastName,
         grade: this.state.grade,
-        educationID: educationID,
+        educationID: educationID.toString(),
         parent: {
           firstName: this.state.parentFirstName,
           lastName: this.state.parentLastName

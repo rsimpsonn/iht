@@ -12,12 +12,15 @@ import alertContext from "../contexts/alertContext";
 import {
   AiOutlineSetting,
   AiOutlineCalendar,
-  AiOutlineClockCircle
+  AiOutlineClockCircle,
+  AiOutlineFlag
 } from "react-icons/ai";
 import getEduLevel from "../educationLevels";
 import { Popup, Divider } from "semantic-ui-react";
 import { withRouter } from "react-router-dom";
 import { SubHeader, Small, Tiny } from "../styles";
+
+import { fullTime } from "../timeFormatter";
 
 class UpcomingSession extends Component {
   constructor(props) {
@@ -48,7 +51,7 @@ class UpcomingSession extends Component {
     const w = await withRef.get();
     let eduLevel = false;
     if (this.props.userContext.isTutor) {
-      eduLevel = await getEduLevel(w.data().educationID);
+      eduLevel = await getEduLevel(w.data().educationID.toString());
     }
 
     const now = new Date();
@@ -196,11 +199,13 @@ class UpcomingSession extends Component {
             <AiOutlineCalendar size={14} /> {days[startDate.getDay()]}{" "}
             {startDate.getMonth() + 1}/{startDate.getDate()}
             &nbsp;&nbsp;&nbsp;&nbsp;
-            <AiOutlineClockCircle size={14} />{" "}
-            {startDate.getHours() % 12 == 0 ? 12 : startDate.getHours() % 12}
-            {startDate.getHours() > 11 ? "PM" : "AM"} -{" "}
-            {endDate.getHours() % 12 == 0 ? 12 : endDate.getHours() % 12}
-            {endDate.getHours() > 11 ? "PM" : "AM"}
+            <AiOutlineClockCircle size={14} /> {fullTime(startDate, endDate)}
+          </Tiny>
+        )}
+        {!this.state.open && (
+          <Tiny>
+            <AiOutlineFlag size={14} />{" "}
+            {this.props.session.recurring ? "Weekly" : "One Time"}
           </Tiny>
         )}
         {this.state.open && (
@@ -231,7 +236,7 @@ const Box = styled.div`
   border-radius: 8px;
   margin: 0 15px;
   padding: 15px;
-  min-width: 17.5%;
+  min-width: 240px;
   width: 17.5%;
 
   ${props =>

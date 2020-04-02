@@ -1,6 +1,9 @@
 import React, { Component } from "react";
 import AvailableTimes from "react-available-times";
 
+import { SubHeader, Small, Tiny, ButtonText, SmallButton } from "../styles";
+import { Divider } from "semantic-ui-react";
+
 import firebase from "../firebase";
 import userContext from "../contexts/userContext";
 
@@ -34,8 +37,9 @@ class Availability extends Component {
 
     console.log(context.user.uid);
     const availRef = firebase.db
-      .collection("opentimeslots")
-      .where("uid", "==", context.user.uid);
+      .collection("tutors")
+      .doc(context.user.uid)
+      .collection("opentimeslots");
 
     const availabilities = await availRef.get();
 
@@ -54,14 +58,42 @@ class Availability extends Component {
     });
   }
 
-  submitTimes() {
+  async submitTimes() {
     let allInitIds = this.state.initIds;
     const context = this.context;
 
-    this.state.availableTimes.forEach(t => {
+    const now = new Date();
+    if (now.getDay() > 2 && now.getDay() < 6) {
+      const nextMonday = new Date();
+      nextMonday.setDate(nextMonday.getDate() - nextMonday.getDay() + 8);
+      const nextSunday = new Date();
+      nextSunday.setDate(nextMonday.getDate() + 6);
+
+      if (
+        this.state.availableTimes.filter(
+          t =>
+            t.start.getDate() >= nextMonday.getDate() &&
+            t.start.getDate() <= nextSunday.getDate()
+        ).length > 0
+      ) {
+        firebase.db
+          .collection("tutors")
+          .doc(context.user.uid)
+          .set(
+            {
+              availableNextWeek: true
+            },
+            { merge: true }
+          );
+      }
+    }
+
+    this.state.availableTimes.forEach(async t => {
       if (t.id) {
         allInitIds = allInitIds.filter(i => i !== t.id);
-        firebase.db
+        const q = await firebase.db
+          .collection("tutors")
+          .doc(context.user.uid)
           .collection("opentimeslots")
           .doc(t.id)
           .set(
@@ -72,18 +104,26 @@ class Availability extends Component {
             { merge: true }
           );
       } else {
-        firebase.db
+        const s = await firebase.db
+          .collection("tutors")
+          .doc(context.user.uid)
           .collection("opentimeslots")
-          .add({ uid: context.user.uid, start: t.start, end: t.end });
+          .add({ start: t.start, end: t.end });
       }
     });
 
-    allInitIds.forEach(id =>
-      firebase.db
+    allInitIds.forEach(async id => {
+      const r = await firebase.db
+        .collection("tutors")
+        .doc(context.user.uid)
         .collection("opentimeslots")
         .doc(id)
-        .delete()
-    );
+        .delete();
+    });
+
+    this.setState({
+      newChanges: false
+    });
   }
 
   render() {
@@ -91,8 +131,28 @@ class Availability extends Component {
       return <p>Loading</p>;
     }
     return (
-      <div>
-        <button onClick={this.submitTimes}>Submit Times</button>
+      <div style={{ padding: "2%" }}>
+        <SubHeader margin>Set your availability</SubHeader>
+        <Small>
+          Drag your mouse over the calendar to create new time slots. Hover over
+          time slots you have already created to remove them.
+          <br />
+          <br />
+          Please note: all tutoring sessions are one hour long, and all time
+          slots you submit will appear to clients as a list of one hour slots.
+          For example, if you set 3-6PM as an open time slot, clients will be
+          able to request a session with you from 3-4PM, 4-5PM, and 5-6PM.
+        </Small>
+        <Divider />
+        {!this.state.newChanges && <Tiny>All time slots saved.</Tiny>}
+        {this.state.newChanges && (
+          <SmallButton
+            style={{ width: "15%", margin: 0 }}
+            onClick={this.submitTimes}
+          >
+            <ButtonText>Confirm Availability</ButtonText>
+          </SmallButton>
+        )}
         <AvailableTimes
           weekStartsOn="monday"
           recurring={false}
@@ -107,7 +167,8 @@ class Availability extends Component {
           ]}
           onChange={availableTimes =>
             this.setState({
-              availableTimes
+              availableTimes,
+              newChanges: true
             })
           }
           initialSelections={this.state.availableTimes}

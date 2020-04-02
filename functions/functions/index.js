@@ -1,5 +1,7 @@
 const functions = require("firebase-functions");
 
+const emailFormatters = require("./emailFormatter");
+
 const admin = require("firebase-admin");
 admin.initializeApp();
 
@@ -13,7 +15,7 @@ let transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
     user: "ivybasetutors@gmail.com",
-    pass: functions.config().gmail.password
+    pass: "P@jamoo$3"
   }
 });
 
@@ -45,49 +47,113 @@ exports.emailNotifications = functions.firestore
   .onCreate(async (snap, context) => {
     const alert = snap.data();
 
-    if (alert.mail) {
-      const userType = await db.doc("users/" + alert.to).get();
-      const user = userType.data();
+    if (!alert.mail) {
+      return;
+    }
+    const formatter = emailFormatters[alert.formatter];
+    const payload = {};
 
-      let emails = [];
+    if (alert.tutor) {
+      const tutor = await db.doc("tutors/" + alert.tutor).get();
+      payload.tutor = tutor.data();
+    }
 
-      const userData = await admin.auth().getUser(alert.to);
-      emails.push(userData.email);
+    if (alert.client) {
+      const client = await db.doc("clients/" + alert.client).get();
+      payload.client = client.data();
+    }
 
-      if (!user.isTutor) {
-        const clientData = await db.doc("clients/" + alert.to).get();
-        const client = clientData.data();
+    if (alert.session) {
+      const session = await db.doc("sessions/" + alert.session).get();
+      payload.session = session.data();
 
-        if (client.emailNotifications) {
-          emails = emails.concat(client.emailNotifications);
+      if (alert.cancelledBy) {
+        const cancelledByTutor = alert.cancelledBy === session.tutor;
+        let cancelledBy = {};
+        if (cancelledByTutor) {
+          cancelledBy = await db.doc("tutors/" + alert.tutor).get();
+        } else {
+          cancelledBy = await db.doc("clients/" + alert.client).get();
         }
+        payload.cancelledBy = cancelledBy;
       }
+    }
 
-      emails.forEach(async e => {
-        let html = `<img style="width: 100px; height: auto" src="https://firebasestorage.googleapis.com/v0/b/ivyhometutors.appspot.com/o/ivybase.png?alt=media&token=8a0deb2b-90d5-44f4-842e-f047390e294c" />
+    if (alert.subject) {
+      const subject = await db.doc("subjects/" + alert.subject).get();
+      payload.subject = subject.data().title;
+    }
+
+    if (alert.type) {
+      payload.type = alert.type;
+    }
+
+    if (alert.chargeAmount) {
+      payload.chargeAmount = alert.chargeAmount;
+    }
+
+    const userType = await db.doc("users/" + alert.to).get();
+    const user = userType.data();
+
+    let emails = [];
+
+    const userData = await admin.auth().getUser(alert.to);
+
+    emails.push(userData.email);
+
+    if (!user.isTutor) {
+      const clientData = await db.doc("clients/" + alert.to).get();
+      const client = clientData.data();
+      payload.to = client;
+
+      if (client.emailNotifications) {
+        emails = emails.concat(client.emailNotifications);
+      }
+    } else {
+      const tutorData = await db.doc("tutors/" + alert.to).get();
+      const tutor = tutorData.data();
+      payload.to = tutor;
+    }
+
+    const formattedEmail = formatter(payload);
+
+    console.log(formattedEmail);
+
+    let preAction = "";
+    let postAction = "";
+
+    const action = formattedEmail.indexOf("act;;");
+    if (action === -1) {
+      preAction = formattedEmail;
+    } else {
+      preAction = formattedEmail.substring(0, action);
+      postAction = formattedEmail.substring(action + 5);
+    }
+
+    emails.forEach(async e => {
+      let html = `<img style="width: 100px; height: auto" src="https://firebasestorage.googleapis.com/v0/b/ivyhometutors.appspot.com/o/ivybase.png?alt=media&token=8a0deb2b-90d5-44f4-842e-f047390e294c" />
         <br />
-        <p>${alert.description}</p>
+        <p>${preAction}</p>
         `;
 
-        if (alert.actionType === "link") {
-          html += `<a href="${alert.url}">${alert.actionText}</a>`;
-        }
+      if (alert.actionType === "link") {
+        html += `<a href="${alert.url}">${alert.actionText}</a>`;
+      }
 
-        const mailOptions = {
-          from: "ivybase Tutors <ivybasetutors@gmail.com>",
-          to: e,
-          subject: alert.message,
-          html
-        };
+      html += postAction;
 
-        const info = await transporter.sendMail(mailOptions);
+      const mailOptions = {
+        from: "ivybase Tutors <ivybasetutors@gmail.com>",
+        to: e,
+        subject: alert.message,
+        html
+      };
 
-        console.log(info);
+      const info = await transporter.sendMail(mailOptions);
 
-        console.log("Message sent: %s", info.messageId);
-        // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
-      });
-    }
+      console.log("Message sent: %s", info.messageId);
+      // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+    });
   });
 
 exports.createIntent = functions.firestore
@@ -106,25 +172,61 @@ exports.createIntent = functions.firestore
   });
 
 exports.completeSessions = functions.pubsub
-  .schedule("every 60 minutes")
-  .onRun(context => {
+  .schedule("1 * * * *")
+  .onRun(async context => {
     const now = new Date();
-    db.collection("sessions")
+
+    const sessionsSnap = await db
+      .collection("sessions")
       .where("status", "==", "Upcoming")
       .where("end", "<=", now)
-      .get()
-      .then(snapshot => {
-        snapshot.docs.forEach(d => {
-          const sessionData = d.data();
-          db.doc("sessions/" + d.id).set(
-            { status: "Completed" },
-            { merge: true }
-          );
-          db.collection(
-            "stripe_customers/" + sessionData.client + "/charges"
-          ).add({ amount: 2500, sessionId: d.id });
+      .get();
+    sessionsSnap.docs.forEach(d => {
+      const sessionData = d.data();
+      if (sessionData.recurring) {
+        const startDate = sessionData.start.toDate();
+        startDate.setDate(startDate.getDate() + 7);
+        const endDate = sessionData.end.toDate();
+        endDate.setDate(endDate.getDate() + 7);
+        db.collection("sessions").add({
+          ...sessionData,
+          start: startDate,
+          end: endDate
         });
+      }
+
+      const start = sessionData.start.toDate();
+
+      const now = new Date();
+
+      db.collection("alerts").add({
+        mail: true,
+        to: sessionData.tutor,
+        client: sessionData.client,
+        session: d.id,
+        chargeAmount: "20.00",
+        formatter: "completedSessionTutor",
+        message: `Thank you for tutoring on ${start.getMonth()}/${start.getDate()} 💚`,
+        time: now
       });
+
+      db.collection("alerts").add({
+        mail: true,
+        tutor: sessionData.tutor,
+        to: sessionData.client,
+        session: d.id,
+        chargeAmount: "25.00",
+        formatter: "completedSessionClient",
+        message: `Your tutoring session on ${start.getMonth()}/${start.getDate()}`,
+        time: now
+      });
+
+      db.doc("sessions/" + d.id).set({ status: "Completed" }, { merge: true });
+      db.collection("stripe_customers/" + sessionData.client + "/charges").add({
+        amount: 2500,
+        sessionId: d.id
+      });
+    });
   });
 
 exports.fulfillCharge = functions.firestore
@@ -172,62 +274,123 @@ exports.createStripeCustomer = functions.auth.user().onCreate(async user => {
 
 exports.newRequest = functions.firestore
   .document("sessions/{session}")
-  .onCreate((snap, context) => {
+  .onCreate(async (snap, context) => {
     const doc = snap.data();
+
+    if (doc.status !== "Requested") {
+      return;
+    }
 
     const now = new Date();
 
     const clientRef = db.doc("clients/" + doc.client);
 
-    clientRef.get().then(clientData => {
-      const client = clientData.data();
+    const clientData = await clientRef.get();
 
-      const alert = {
-        to: doc.tutor,
-        actionText: "See request",
+    const client = clientData.data();
+
+    const alert = {
+      mail: true,
+      to: doc.tutor,
+      client: doc.client,
+      session: snap.id,
+      subject: doc.subjectID,
+      formatter: "initRequest",
+      actionText: "Go to dashboard",
+      actionType: "link",
+      url: "http://localhost:3000/dashboard",
+      message: "You have a new session request from " + client.firstName,
+      time: now
+    };
+
+    console.log(alert);
+
+    db.collection("alerts").add(alert);
+  });
+
+exports.remindAvailabilityWeekly = functions.firestore.pubsub
+  .schedule("0 17 * * 3")
+  .onRun(async context => {
+    const tutorSnapshot = await db.collection("tutors").get();
+
+    const now = new Date();
+
+    tutorSnapshot.docs.forEach(t => {
+      db.collection("alerts").add({
+        mail: true,
+        to: t.id,
+        formatter: "remindAvailability",
+        actionText: "Go to dashboard",
         actionType: "link",
-        url: "/",
-        message: "You have a new session request from " + client.firstName,
+        url: "http://localhost:3000/dashboard",
+        message: "Confirm tutoring availability for next week",
         time: now
-      };
+      });
+    });
+  });
 
-      console.log(alert);
+exports.setAvailability = functions.firestore.pubsub
+  .schedule("59 24 * * 0")
+  .onRun(async context => {
+    const tutorSnapshot = await db.collection("tutors").get();
 
-      db.collection("alerts").add(alert);
+    tutorSnapshot.docs.forEach(async t => {
+      const tutor = t.data();
+
+      const now = new Date();
+
+      const pastTimeSlotsSnap = await db
+        .collection(`tutors/${t.id}/opentimeslots`)
+        .where("end", "<=", now)
+        .get();
+      pastTimeSlotsSnap.docs.forEach(ts => ts.delete());
+
+      db.doc("tutors/" + t.id).set(
+        {
+          available: tutor.availableNextWeek,
+          availableNextWeek: false
+        },
+        { merge: true }
+      );
     });
   });
 
 exports.updateRequest = functions.firestore
   .document("sessions/{session}")
-  .onUpdate((change, context) => {
+  .onUpdate(async (change, context) => {
     const before = change.before.data();
     const after = change.after.data();
+    const now = new Date();
 
     const tutorRef = db.doc("tutors/" + before.tutor);
-    tutorRef
-      .get()
-      .then(doc => {
-        const tutor = doc.data();
+    const doc = await tutorRef.get();
+    const tutor = doc.data();
 
-        if (before.status === "Requested" && after.status === "Upcoming") {
-          db.collection("alerts").add({
-            to: before.client,
-            actionText: "See upcoming session",
-            actionType: "Link",
-            url: "/",
-            message: tutor.firstName + " has accepted your session request",
-            time: now
-          });
-        } else if (
-          before.status === "Requested" &&
-          after.status === "Declined"
-        ) {
-          db.collection("alerts").add({
-            to: before.client,
-            message: tutor.firstName + " has declined your session request",
-            time: now
-          });
-        }
-      })
-      .catch(e => console.log(e));
+    if (before.status === "Requested" && after.status === "Upcoming") {
+      db.collection("alerts").add({
+        mail: true,
+        tutor: before.tutor,
+        session: change.before.id,
+        to: before.client,
+        formatter: "acceptedRequest",
+        actionText: "See upcoming session",
+        actionType: "link",
+        url: "http://localhost:3000/dashboard",
+        message: tutor.firstName + " has accepted your session request",
+        time: now
+      });
+    } else if (before.status === "Requested" && after.status === "Declined") {
+      db.collection("alerts").add({
+        mail: true,
+        tutor: before.tutor,
+        session: change.before.id,
+        formatter: "declinedRequest",
+        actionText: "Schedule a new session",
+        actionType: "link",
+        url: "http://localhost:3000/dashboard",
+        to: before.client,
+        message: tutor.firstName + " has declined your session request",
+        time: now
+      });
+    }
   });

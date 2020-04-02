@@ -16,7 +16,8 @@ import {
   AiOutlineCalendar,
   AiOutlineUser,
   AiOutlineClockCircle,
-  AiOutlineSetting
+  AiOutlineSetting,
+  AiOutlineFlag
 } from "react-icons/ai";
 
 class RequestedSession extends Component {
@@ -41,7 +42,7 @@ class RequestedSession extends Component {
 
     let eduLevel = false;
     if (context.isTutor) {
-      eduLevel = await getEduLevel(meetingWith.data().educationID);
+      eduLevel = await getEduLevel(meetingWith.data().educationID.toString());
     }
 
     this.setState({
@@ -138,6 +139,9 @@ class RequestedSession extends Component {
               {this.state.meetingWith.profilePic && (
                 <Circle src={this.state.meetingWith.profilePic} />
               )}
+              &nbsp;&nbsp;&nbsp;&nbsp;
+              <AiOutlineFlag size={14} />{" "}
+              {this.props.session.recurring ? "Weekly" : "One Time"}
             </Tiny>
           )}
         </Box>
@@ -211,7 +215,7 @@ const Box = styled.div`
   border-radius: 8px;
   margin: 0 15px;
   padding: 15px;
-  min-width: 17.5%;
+  min-width: 240px;
   width: 17.5%;
 `;
 

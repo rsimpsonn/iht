@@ -13,17 +13,15 @@ class User extends Component {
   };
 
   async componentDidMount() {
-    const userRef = firebase.db
+    firebase.db
       .collection(this.props.isTutor ? "tutors" : "clients")
-      .doc(this.props.id);
-    const userDoc = await userRef.get();
-    console.log(userDoc.data());
-
-    this.context.setUserDetails({ id: this.props.id, ...userDoc.data() });
-
-    this.setState({
-      userDetails: userDoc.data()
-    });
+      .doc(this.props.id)
+      .onSnapshot(userDoc => {
+        this.context.setUserDetails({ id: this.props.id, ...userDoc.data() });
+        this.setState({
+          userDetails: userDoc.data()
+        });
+      });
   }
 
   render() {

@@ -65,10 +65,6 @@ function Toolbar(props) {
                   <AiOutlineHome style={{ margin: 5 }} size={25} />
                   <ListItem bold>Dashboard</ListItem>
                 </Icon>
-                <Icon onClick={() => props.history.push("/calendar")}>
-                  <AiOutlineCalendar style={{ margin: 5 }} size={25} />
-                  <ListItem bold>Calendar</ListItem>
-                </Icon>
                 <Alerts userContext={context} />
                 <Icon>
                   <Popup

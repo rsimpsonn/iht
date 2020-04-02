@@ -118,7 +118,7 @@ const Box = styled.div`
   border-radius: 8px;
   margin: 0 15px;
   padding: 15px;
-  min-width: 17.5%;
+  min-width: 240px;
   width: 17.5%;
 `;
 
