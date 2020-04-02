@@ -61,7 +61,7 @@ const cancellation = payload => {
   return `
   Dear ${to.firstName},<br /><br />
 
-  Unfortunately, your upcoming session on ${formatted} with ${cancelledBy.firstName} has been cancelled. Please sign in to your dashboard to schedule a new tutoring session.<br /><br />
+  Unfortunately, your upcoming session on ${formatted} with ${cancelledBy.firstName} has been cancelled. Enter your dashboard to schedule a new tutoring session.<br /><br />
 
   act;;
   <br /><br />
@@ -175,6 +175,38 @@ const verified = payload => {
   `;
 };
 
+const reviewedTranscript = payload => {
+  const { to } = payload;
+  return `
+  Dear ${to.firstName}, <br /><br />
+
+  We have reviewed and verified the unofficial transcript you submitted. You may have more steps to complete before you can start tutoring with ivybase. These are visible on your dashboard.
+
+  act;;
+
+  Best, <br /><br />
+  ivybase
+  <br /><br />
+  `;
+};
+
+const declinedTranscript = payload => {
+  const { to, reason } = payload;
+  return `
+  Dear ${to.firstName}, <br /><br />
+
+  We have reviewed the unofficial transcript you submitted, but could not verify the transcript for the following reason: ${reason}<br /><br />
+
+  You may resubmit another transcript on your dashboard.
+
+  act;;
+
+  Best, <br /><br />
+  ivybase
+  <br /><br />
+  `;
+};
+
 const remindAvailability = payload => {
   const { to } = payload;
   return `
@@ -203,5 +235,7 @@ module.exports = {
   cancellation,
   acceptedRequest,
   declinedRequest,
-  initRequest
+  initRequest,
+  declinedTranscript,
+  reviewedTranscript
 };

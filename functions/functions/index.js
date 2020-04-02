@@ -92,6 +92,10 @@ exports.emailNotifications = functions.firestore
       payload.chargeAmount = alert.chargeAmount;
     }
 
+    if (alert.reason) {
+      payload.reason = alert.reason;
+    }
+
     const userType = await db.doc("users/" + alert.to).get();
     const user = userType.data();
 
@@ -355,6 +359,40 @@ exports.setAvailability = functions.firestore.pubsub
     });
   });
 
+exports.verifyTutors = functions.firestore
+  .document("verifications/{tutor}")
+  .onUpdate(async (change, context) => {
+    const before = change.before.data();
+    const after = change.after.data();
+
+    const now = new Date();
+
+    if (!before.isVerified && after.isVerified) {
+      db.collection("alerts").add({
+        mail: true,
+        to: context.params.tutor,
+        message: "Your transcript has been verified",
+        formatter: "reviewedTranscript",
+        actionText: "Go to dashboard",
+        actionType: "link",
+        url: "http://localhost:3000/dashboard",
+        time: now
+      });
+    } else if (before.status === "Pending" && after.status === "Declined") {
+      db.collection("alerts").add({
+        mail: true,
+        to: context.params.tutor,
+        message: "Your transcript could not be verified",
+        formatter: "declinedTranscript",
+        actionText: "Go to dashboard",
+        actionType: "link",
+        url: "http://localhost:3000/dashboard",
+        reason: after.rejectedReason,
+        time: now
+      });
+    }
+  });
+
 exports.updateRequest = functions.firestore
   .document("sessions/{session}")
   .onUpdate(async (change, context) => {
@@ -392,5 +430,67 @@ exports.updateRequest = functions.firestore
         message: tutor.firstName + " has declined your session request",
         time: now
       });
+    } else if (
+      before.status === "Upcoming" &&
+      after.status === "Cancelled no fee"
+    ) {
+      db.collection("alerts").add({
+        mail: true,
+        to: after.cancelledBy === after.tutor ? before.client : before.tutor,
+        session: change.before.id,
+        formatter: "cancellation",
+        actionText: "Schedule a new session",
+        actionType: "link",
+        url: "http://localhost:3000/dashboard",
+        message: "Your tutoring session has been cancelled",
+        time: now
+      });
+    } else if (
+      before.status === "Upcoming" &&
+      after.status === "Cancelled fee"
+    ) {
+      if (after.cancelledBy === after.tutor) {
+        if (!tutor.warnings) {
+          db.collection("alerts").add({
+            mail: true,
+            to: before.tutor,
+            session: change.before.id,
+            client: before.client,
+            formatter: "firstWarning",
+            message: "Under 24-Hour Cancellation Warning",
+            time: now
+          });
+
+          db.doc("tutors/" + before.tutor).set(
+            { warnings: 1 },
+            { merge: true }
+          );
+        } else {
+          db.collection("alerts").add({
+            mail: true,
+            to: before.tutor,
+            session: change.before.id,
+            client: before.client,
+            formatter: "termination",
+            message: "Your account has been terminated",
+            time: now
+          });
+
+          db.doc("tutors/" + before.tutor).set(
+            { warnings: false, terminated: true },
+            { merge: true }
+          );
+        }
+      } else {
+        db.collection("alerts").add({
+          mail: true,
+          to: before.client,
+          tutor: before.tutor,
+          session: change.before.id,
+          chargeAmount: "25.00",
+          message: "Under 24-Hour Cancellation",
+          time: now
+        });
+      }
     }
   });
