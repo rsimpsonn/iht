@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+/whiteboard-server/node-modules
 /.pnp
 .pnp.js
 
