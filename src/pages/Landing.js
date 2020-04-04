@@ -1,18 +1,14 @@
 import React from "react";
 import styled from "styled-components";
 
-import FirebaseAuthContext from "../contexts/userContext";
+import WhiteboardScreen from "../components/Whiteboard";
 
 function Landing() {
-
-  const { authStatusReported, isUserSignedIn } = FirebaseAuthContext;
-
   return (
     <Main>
-      <p>{authStatusReported}</p>
-      <p>{isUserSignedIn}</p>
+      <WhiteboardScreen />
     </Main>
-  )
+  );
 }
 
 const Main = styled.div`

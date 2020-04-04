@@ -15,7 +15,8 @@ import EmailNotVerified from "./EmailNotVerified";
 import {
   AiOutlineBell,
   AiOutlineCalendar,
-  AiOutlineHome
+  AiOutlineHome,
+  AiOutlineNotification
 } from "react-icons/ai";
 
 import fullLogo from "../images/ivybase.png";
@@ -61,6 +62,10 @@ function Toolbar(props) {
             )}
             {context.user != null && (
               <Bar>
+                <Icon onClick={() => props.history.push("/support")}>
+                  <AiOutlineNotification style={{ margin: 5 }} size={25} />
+                  <ListItem bold>Support</ListItem>
+                </Icon>
                 <Icon onClick={() => props.history.push("/dashboard")}>
                   <AiOutlineHome style={{ margin: 5 }} size={25} />
                   <ListItem bold>Dashboard</ListItem>

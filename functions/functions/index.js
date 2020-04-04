@@ -42,6 +42,74 @@ let transporter = nodemailer.createTransport({
   };
 });*/
 
+exports.clientSupport = functions.firestore
+  .document("support/client/tickets/{ticket}")
+  .onCreate(async (snap, context) => {
+    const ticketData = snap.data();
+    const userData = await admin.auth().getUser(ticketData.from);
+    const userDetailsDoc = await db.doc(`clients/${ticketData.from}`).get();
+    const userDetails = userDetailsDoc.data();
+    const labelDoc = await db
+      .doc(`support/client/labels/${ticketData.label}`)
+      .get();
+    const label = labelDoc.data();
+
+    const html = `
+  <p>New CLIENT support request from <span style="font-weight: bold;">${userDetails.firstName} ${userDetails.lastName}</span>:<br /><br />
+
+  Support type: <span style="font-weight: bold;">${label.title}</span><br />
+  Reply at: <span style="font-weight: bold;">${userData.email}</span><br />
+  Message:
+  ${ticketData.message}
+  </p>
+  `;
+
+    const mailOptions = {
+      from: "ivybase Tutors <ivybasetutors@gmail.com>",
+      to: "ivybasetutors@gmail.com",
+      subject: `[Support required]: New CLIENT support request from ${userDetails.firstName} ${userDetails.lastName}`,
+      html
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+
+    console.log("Message sent: %s", info.messageId);
+  });
+
+exports.tutorSupport = functions.firestore
+  .document("support/tutor/tickets/{ticket}")
+  .onCreate(async (snap, context) => {
+    const ticketData = snap.data();
+    const userData = await admin.auth().getUser(ticketData.from);
+    const userDetailsDoc = await db.doc(`tutors/${ticketData.from}`).get();
+    const userDetails = userDetailsDoc.data();
+    const labelDoc = await db
+      .doc(`support/tutor/labels/${ticketData.label}`)
+      .get();
+    const label = labelDoc.data();
+
+    const html = `
+  <p>New TUTOR support request from <span style="font-weight: bold;">${userDetails.firstName} ${userDetails.lastName}</span>:<br /><br />
+
+  Support type: <span style="font-weight: bold;">${label.title}</span><br />
+  Reply at: <span style="font-weight: bold;">${userData.email}</span><br />
+  Message:
+  ${ticketData.message}
+  </p>
+  `;
+
+    const mailOptions = {
+      from: "ivybase Tutors <ivybasetutors@gmail.com>",
+      to: "ivybasetutors@gmail.com",
+      subject: `[Support required]: New TUTOR support request from ${userDetails.firstName} ${userDetails.lastName}`,
+      html
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+
+    console.log("Message sent: %s", info.messageId);
+  });
+
 exports.emailNotifications = functions.firestore
   .document("alerts/{newAlert}")
   .onCreate(async (snap, context) => {
@@ -312,7 +380,7 @@ exports.newRequest = functions.firestore
     db.collection("alerts").add(alert);
   });
 
-exports.remindAvailabilityWeekly = functions.firestore.pubsub
+exports.remindAvailabilityWeekly = functions.pubsub
   .schedule("0 17 * * 3")
   .onRun(async context => {
     const tutorSnapshot = await db.collection("tutors").get();
@@ -333,7 +401,7 @@ exports.remindAvailabilityWeekly = functions.firestore.pubsub
     });
   });
 
-exports.setAvailability = functions.firestore.pubsub
+exports.setAvailability = functions.pubsub
   .schedule("59 24 * * 0")
   .onRun(async context => {
     const tutorSnapshot = await db.collection("tutors").get();
