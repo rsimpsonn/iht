@@ -34,7 +34,8 @@ class ScheduleSession extends Component {
   state = {
     subjectsAvailable: [],
     frontSide: true,
-    university: ""
+    university: "",
+    recurring: false
   };
 
   async componentDidMount() {
@@ -307,12 +308,15 @@ class ScheduleSession extends Component {
         )}
         {!this.state.frontSide && (
           <div>
-            {this.props.tutor.bio && (
-              <div style={{ marginBottom: 10 }}>
-                <Tiny>Bio</Tiny>
-                <Small color="black">{this.props.tutor.bio}</Small>
-              </div>
-            )}
+            <div style={{ marginBottom: 10 }}>
+              <Tiny>Bio</Tiny>
+              <Small
+                style={{ height: 100, maxHeight: 100, overflow: "hidden" }}
+                color="black"
+              >
+                {this.props.tutor.bio}
+              </Small>
+            </div>
             {university && (
               <Tiny>
                 <AiOutlineBank size={14} /> {university}

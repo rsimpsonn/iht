@@ -35,6 +35,9 @@ const Bar = styled.div`
   display: flex;
   flex-direction: row;
   overflow-x: scroll;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 const TopMargin = styled.div`

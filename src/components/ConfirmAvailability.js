@@ -25,14 +25,14 @@ function ConfirmAvailability(props) {
           <Small margin>
             <AiOutlineFlag
               style={{ marginRight: 10 }}
-              color="#09AA82"
+              color="#FF8989"
               size={16}
             />
             Please note that right now, you are an unavailable tutor, meaning
             that you are not visible on clients' dashboards.
             <br />
             To be an available tutor on ivybase, you must confirm your
-            availability each week between Wednesday and Friday.
+            availability once each week between Wednesday and Friday.
           </Small>
         </Box>
       );

@@ -50,6 +50,27 @@ class SearchTutors extends Component {
     });
   }
 
+  hourSlots(times) {
+    let hourSlots = [];
+
+    times.forEach(t => {
+      let start = t.start;
+      const increment = 60;
+
+      while (start < t.end) {
+        let nextHour = new Date(start.getTime());
+        nextHour.setMinutes(nextHour.getMinutes() + increment);
+        hourSlots.push({
+          start: start,
+          end: nextHour
+        });
+        start = nextHour;
+      }
+    });
+
+    return hourSlots;
+  }
+
   async loadSubjects() {
     const subjects = await getAllSubjects();
 
@@ -62,6 +83,16 @@ class SearchTutors extends Component {
   }
 
   async loadTutors() {
+    const now = new Date();
+    let daysInAdvance = 9;
+    if (now.getDay() !== 6) {
+      daysInAdvance -= now.getDay() + 1;
+    }
+
+    const end = new Date();
+    end.setDate(end.getDate() + daysInAdvance);
+    end.setHours(24);
+
     if (
       !(
         this.state.selectedSubject ||
@@ -77,7 +108,9 @@ class SearchTutors extends Component {
       return;
     }
 
-    let tutorRef = firebase.db.collection("tutors");
+    let tutorRef = firebase.db
+      .collection("tutors")
+      .where("available", "==", true);
     console.log("load");
 
     if (this.state.selectedSubject) {
@@ -108,14 +141,56 @@ class SearchTutors extends Component {
 
     const tutorSnap = await tutorRef.get();
 
-    this.setState({
-      tutors: tutorSnap.docs.map(d => {
+    let tutors = [];
+
+    tutorSnap.docs.forEach(async d => {
+      const timeSlotRef = firebase.db
+        .collection("tutors")
+        .doc(d.id)
+        .collection("opentimeslots");
+      const timeSlotSnap = await timeSlotRef.get();
+      const timeSlots = timeSlotSnap.docs.map(t => {
+        const ts = t.data();
         return {
-          id: d.id,
-          ...d.data()
+          start: ts.start.toDate(),
+          end: ts.end.toDate()
         };
-      }),
-      loading: false
+      });
+      let slots = this.hourSlots(timeSlots);
+
+      const sessionRef = firebase.db
+        .collection("sessions")
+        .where("start", ">", now)
+        .where("start", "<", end);
+      const sessionsSnap = await sessionRef.get();
+      const sessions = sessionsSnap.docs.map(t => {
+        const ts = t.data();
+        return {
+          start: ts.start.toDate(),
+          end: ts.end.toDate()
+        };
+      });
+
+      sessions.forEach(s => {
+        slots = slots.filter(
+          slot => slot.start.getHours() !== s.start.getHours()
+        );
+      });
+
+      const tutor = d.data();
+
+      tutors.push({
+        id: d.id,
+        ...tutor,
+        availabilityScore: 0.8 * sessions.length + 0.2 * tutor.rating
+      });
+
+      if (tutors.length === tutorSnap.docs.length) {
+        this.setState({
+          tutors,
+          loading: false
+        });
+      }
     });
   }
 
@@ -239,8 +314,12 @@ class SearchTutors extends Component {
       });
     }
 
+    console.log(this.state.tutors);
+
     if (this.state.tutors) {
-      tutors = this.filterLoadedTutors();
+      tutors = this.state.tutors.sort(
+        (a, b) => b.availabilityScore - a.availabilityScore
+      );
     }
 
     return (
@@ -325,9 +404,14 @@ class SearchTutors extends Component {
 
 const Scroll = styled.div`
   overflow-x: scroll;
+
   display: flex;
   flex-direction: row;
   padding: 2% 0px;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 const Row = styled.div`

@@ -28,6 +28,10 @@ const Bar = styled.div`
   display: flex;
   padding: 2%;
   flex-direction: row;
+  overflow-x: scroll;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 const TopMargin = styled.div`

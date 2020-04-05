@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import styled from "styled-components";
-import { Dropdown, Divider } from "semantic-ui-react";
+import { Dropdown, Divider, Loader } from "semantic-ui-react";
 
 import "../customfileinputs.css";
 
@@ -97,7 +97,7 @@ class TutorSettings extends Component {
     const userDetailsDoc = await userDetailsRef.get();
     const userDetails = userDetailsDoc.data();
 
-    this.context.setUserDetails({ userDetails });
+    this.context.setUserDetails(userDetails);
 
     let changedFields = ["elementaryPref", "middlePref", "highPref"];
     changedFields.forEach(f => {
@@ -151,7 +151,7 @@ class TutorSettings extends Component {
     const userDetailsDoc = await userDetailsRef.get();
     const userDetails = userDetailsDoc.data();
 
-    this.context.setUserDetails({ userDetails });
+    this.context.setUserDetails(userDetails);
 
     this.setState({
       editingProfile: false
@@ -159,6 +159,10 @@ class TutorSettings extends Component {
   }
 
   render() {
+    if (!this.context.userDetails.firstName) {
+      return <Loader active={true}>Loading</Loader>;
+    }
+
     if (this.context.userDetails && !this.state.college) {
       this.getCollege();
     }

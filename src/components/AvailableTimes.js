@@ -44,10 +44,11 @@ class AvailableTimes extends Component {
 
     this.state.availableTimes.forEach(t => {
       let start = t.start;
+      const increment = this.props.minutes ? this.props.minutes : 60;
 
       while (start < t.end) {
         let nextHour = new Date(start.getTime());
-        nextHour.setHours(nextHour.getHours() + 1);
+        nextHour.setMinutes(nextHour.getMinutes() + increment);
         hourSlots.push({
           start: start,
           end: nextHour
@@ -63,8 +64,12 @@ class AvailableTimes extends Component {
     const now = new Date();
 
     let daysInAdvance = 9;
-    if (now.getDay() !== 6) {
-      daysInAdvance -= now.getDay() + 1;
+    if (this.props.daysInAdvance) {
+      daysInAdvance = this.props.daysInAdvance;
+    } else {
+      if (now.getDay() !== 6) {
+        daysInAdvance -= now.getDay() + 1;
+      }
     }
 
     let advance = new Date();
@@ -96,14 +101,24 @@ class AvailableTimes extends Component {
     const now = new Date();
 
     let daysInAdvance = 9;
-    if (now.getDay() !== 6) {
-      daysInAdvance -= now.getDay() + 1;
+    if (this.props.daysInAdvance) {
+      daysInAdvance = this.props.daysInAdvance;
+    } else {
+      if (now.getDay() !== 6) {
+        daysInAdvance -= now.getDay() + 1;
+      }
+    }
+
+    const filterValue = new Date();
+    if (this.props.delay) {
+      filterValue.setDate(now.getDate() + Math.floor(this.props.delay / 24));
+      filterValue.setHours(now.getHours() + (this.props.delay % 24));
+    } else {
+      filterValue.setHours(now.getHours() + 1);
     }
 
     const hourSlots = this.hourSlots()
-      .filter(
-        d => d.start > new Date(now.getTime()).setHours(now.getHours() + 1)
-      )
+      .filter(d => d.start.getTime() > filterValue.getTime())
       .filter(
         s =>
           !this.state.overlappingSessions.some(
@@ -111,28 +126,33 @@ class AvailableTimes extends Component {
           )
       );
     const range = Array.from(Array(daysInAdvance).keys());
+    const formatter = this.props.formatter ? this.props.formatter : fullTime;
 
     return (
       <Grid centered divided columns={daysInAdvance}>
         {range.map(d => {
           const date = new Date(now.getTime());
           date.setDate(now.getDate() + d);
-          console.log(date);
           return (
-            <Grid.Column style={{ width: 140 }} textAlign="center">
+            <Grid.Column
+              style={{ width: this.props.wide ? 180 : 140 }}
+              textAlign="center"
+            >
               <Tiny>
                 {abbreviations[date.getDay()]} {date.getMonth()}/
                 {date.getDate()}
               </Tiny>
-              {hourSlots
-                .filter(s => s.start.getDate() === date.getDate())
-                .map(s => (
-                  <GrayLine onClick={() => this.props.callback(s)}>
-                    <Tiny bold={this.props.selected === s.start.getTime()}>
-                      {fullTime(s.start, s.end)}
-                    </Tiny>
-                  </GrayLine>
-                ))}
+              <Scroll>
+                {hourSlots
+                  .filter(s => s.start.getDate() === date.getDate())
+                  .map(s => (
+                    <GrayLine onClick={() => this.props.callback(s)}>
+                      <Tiny bold={this.props.selected === s.start.getTime()}>
+                        {formatter(s.start, s.end)}
+                      </Tiny>
+                    </GrayLine>
+                  ))}
+              </Scroll>
             </Grid.Column>
           );
         })}
@@ -164,6 +184,15 @@ const GrayLine = styled.div`
   border-radius: 0.3em;
   margin: 10px 0;
   cursor: pointer;
+`;
+
+const Scroll = styled.div`
+  overflow-y: scroll;
+  max-height: 300px;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 const Col = styled.div`

@@ -157,14 +157,14 @@ class TutorSignUp extends Component {
         lastName: this.state.lastName,
         year: this.state.selectedYear,
         birthDate: `${this.state.selectedMonth} ${this.state.day}, ${this.state.birthYear}`,
-        universityID: this.state.selectedUniversity,
-        majorID: this.state.selectedMajor,
+        universityID: this.state.selectedUniversity.toString(),
+        majorID: this.state.selectedMajor.toString(),
         answers: {
           subject: this.state.selectedSubjects,
           schedule: this.state.selectedSchedule
         },
         sessions: 0,
-        rating: 0,
+        rating: 4.2,
         verified: false
       };
 
@@ -201,13 +201,23 @@ class TutorSignUp extends Component {
     if (!this.state.universities) {
       this.loadUniversities();
     } else {
-      universityOptions = this.state.universities.map(u => {
-        return {
-          text: u.title,
-          value: u.id,
-          key: u.id
-        };
-      });
+      universityOptions = this.state.universities
+        .sort((a, b) => {
+          if (a.title < b.title) {
+            return -1;
+          }
+          if (a.title > b.title) {
+            return 1;
+          }
+          return 0;
+        })
+        .map(u => {
+          return {
+            text: u.title,
+            value: u.id,
+            key: u.id
+          };
+        });
     }
 
     let majorOptions = [];

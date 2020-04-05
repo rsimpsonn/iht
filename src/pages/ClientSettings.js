@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import styled from "styled-components";
-import { Dropdown, Divider } from "semantic-ui-react";
+import { Dropdown, Divider, Loader } from "semantic-ui-react";
 import CreditCard from "../components/CreditCard";
 
 import {
@@ -69,7 +69,7 @@ class ClientSettings extends Component {
     const userDetailsDoc = await userDetailsRef.get();
     const userDetails = userDetailsDoc.data();
 
-    this.context.setUserDetails({ userDetails });
+    this.context.setUserDetails(userDetails);
 
     this.setState({
       editingProfile: false,
@@ -78,6 +78,10 @@ class ClientSettings extends Component {
   }
 
   render() {
+    if (!this.context.userDetails.firstName) {
+      return <Loader active={true}>Loading</Loader>;
+    }
+
     if (this.context.userDetails && !this.state.allEducationLevels) {
       this.getAllEducationLevels();
     }

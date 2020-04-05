@@ -1,6 +1,6 @@
 import React, { useState, useContext } from "react";
 import styled from "styled-components";
-import { Divider, Accordion, Icon, Loader } from "semantic-ui-react";
+import { Divider, Accordion, Icon, Loader, Popup } from "semantic-ui-react";
 import { withRouter } from "react-router-dom";
 
 import { Tiny, Small, SubHeader, SmallButton, ButtonText } from "../styles";
@@ -13,8 +13,14 @@ import {
 import Dropzone from "react-dropzone";
 
 import firebase from "../firebase";
+import AvailableTimes from "./AvailableTimes";
 
 import userDetailsContext from "../contexts/userDetailsContext";
+
+import { smallDayMonthDateFullTime } from "../timeFormatter";
+
+const adminTutor = "mPfGJWoPfRX22ceEcIElq9MO7Kk1";
+const adminClient = "npKaZDVQchS58KuhHmS0YOkSyPp1";
 
 function Checklist(props) {
   const [profileBioOpen, setProfileBio] = useState(false);
@@ -23,6 +29,9 @@ function Checklist(props) {
   const [verification, setVerification] = useState(false);
   const [file, setFile] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [interview, setInterview] = useState(false);
+  const [interviewOpen, toggleInterview] = useState(false);
+  const [selectedTime, setTime] = useState(false);
 
   const context = useContext(userDetailsContext);
 
@@ -80,6 +89,43 @@ function Checklist(props) {
     setFile(acceptedFiles[0]);
   }
 
+  async function handleInterview() {
+    setLoading(true);
+
+    if (!selectedTime) {
+      alert("Please select an interview time");
+    }
+
+    const session = await firebase.db
+      .collection("sessions")
+      .doc(`interview${context.userDetails.id}`)
+      .set({
+        start: selectedTime.start,
+        end: selectedTime.end,
+        client: adminClient,
+        tutor: context.userDetails.id,
+        status: "Upcoming",
+        subjectID: "99"
+      });
+
+    getInterview();
+  }
+
+  async function getInterview() {
+    const docRef = firebase.db
+      .collection("sessions")
+      .doc(`interview${context.userDetails.id}`);
+    const doc = await docRef.get();
+
+    if (doc.exists) {
+      setInterview({ exists: true, ...doc.data() });
+      setLoading(false);
+    } else {
+      setInterview({ exists: false });
+      setLoading(false);
+    }
+  }
+
   async function submitVerification() {
     setLoading(true);
     const storageRef = firebase.storage.ref();
@@ -108,6 +154,10 @@ function Checklist(props) {
 
   if (!verification) {
     getVerification();
+  }
+
+  if (!interview) {
+    getInterview();
   }
 
   return (
@@ -258,6 +308,112 @@ function Checklist(props) {
           )}
         </Accordion>
       )}
+      {interview && (
+        <div>
+          <Divider />
+          <Accordion>
+            <Accordion.Title
+              active={interviewOpen}
+              index={0}
+              onClick={() => toggleInterview(!interviewOpen)}
+            >
+              {interview.exists && interview.completed ? (
+                interview.verified ? (
+                  <AiOutlineCheckCircle
+                    color="#09AA82"
+                    style={{ marginRight: 10 }}
+                    size={16}
+                  />
+                ) : (
+                  <AiOutlineCloseCircle
+                    color="#FF8989"
+                    style={{ marginRight: 10 }}
+                    size={16}
+                  />
+                )
+              ) : (
+                <Icon name="dropdown" />
+              )}
+              Complete a 5-minute interview.
+            </Accordion.Title>
+            <Accordion.Content active={interviewOpen}>
+              <Small>
+                To tutor on ivybase, you must complete a brief interview. During
+                the interview, you will be asked to tutor your interviewer
+                through a short practice problem in a subject of your choice.
+              </Small>
+              {!interview.exists && (
+                <div>
+                  <Divider />
+                  <Popup
+                    trigger={
+                      <SmallButton
+                        style={{ width: "18%", margin: 0, marginBottom: 10 }}
+                      >
+                        <ButtonText>
+                          {selectedTime
+                            ? smallDayMonthDateFullTime(
+                                selectedTime.start,
+                                selectedTime.end
+                              )
+                            : "Choose Interview Time"}
+                        </ButtonText>
+                      </SmallButton>
+                    }
+                    hoverable
+                    position="bottom center"
+                    fluid
+                    flowing
+                  >
+                    <AvailableTimes
+                      tutor={{ id: adminTutor }}
+                      minutes={10}
+                      delay={24}
+                      callback={ts => setTime(ts)}
+                      selected={
+                        selectedTime ? selectedTime.start.getTime() : false
+                      }
+                      daysInAdvance={7}
+                      wide
+                    />
+                  </Popup>
+                  {selectedTime && (
+                    <SmallButton
+                      onClick={handleInterview}
+                      style={{ width: "18%", margin: 0 }}
+                    >
+                      <ButtonText>Confirm Interview</ButtonText>
+                    </SmallButton>
+                  )}
+                </div>
+              )}
+              {interview.exists && interview.verified && (
+                <GrayLine style={{ marginTop: 20 }}>
+                  <Small>You have successfully completed your interview.</Small>
+                </GrayLine>
+              )}
+              {interview.exists && interview.completed && !interview.verified && (
+                <GrayLine style={{ marginTop: 20 }}>
+                  <Small>
+                    Thank you for interviewing, but unfortunately, we cannot
+                    accept you as an ivybase tutor at this time.
+                  </Small>
+                </GrayLine>
+              )}
+              {interview.exists && !interview.completed && (
+                <GrayLine style={{ marginTop: 20 }}>
+                  <Small>
+                    Your interview has been scheduled. Details are visible on
+                    your Upcoming Sessions panel. The interview room will open
+                    five minutes in advance of your start time on your
+                    dashboard.
+                  </Small>
+                </GrayLine>
+              )}
+            </Accordion.Content>
+          </Accordion>
+        </div>
+      )}
       <Divider />
       <Accordion>
         <Accordion.Title
@@ -266,7 +422,7 @@ function Checklist(props) {
           onClick={() => setBank(!bankOpen)}
         >
           <Icon name="dropdown" />
-          Set up routing account so that you can receive funds.
+          Set up routing account so that you can receive payment.
         </Accordion.Title>
         <Accordion.Content active={bankOpen}>
           <p>

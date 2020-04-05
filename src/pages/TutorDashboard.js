@@ -28,30 +28,16 @@ class TutorDashboard extends Component {
     firebase.db
       .collection("sessions")
       .where(userType, "==", context.user.uid)
-      .onSnapshot(snapshot => {
-        snapshot.docChanges().forEach(change => {
-          let newSessions = this.state.sessions;
-          if (change.type === "added") {
-            newSessions.push({ id: change.doc.id, ...change.doc.data() });
-          }
-
-          if (change.type === "modified") {
-            const updatedSession = change.doc.data();
-            let oldSession = newSessions.findIndex(s => s.id === change.doc.id);
-            newSessions[oldSession] = {
-              id: change.doc.id,
-              ...updatedSession
+      .onSnapshot(snapshot =>
+        this.setState({
+          sessions: snapshot.docs.map(s => {
+            return {
+              id: s.id,
+              ...s.data()
             };
-          }
-
-          console.log(this.state.sessions === newSessions);
-          this.setState({
-            sessions: newSessions.sort(
-              (a, b) => a.start.toDate().getTime() - b.start.toDate().getTime()
-            )
-          });
-        });
-      });
+          })
+        })
+      );
   }
 
   render() {
@@ -64,8 +50,8 @@ class TutorDashboard extends Component {
 
     return (
       <div>
-        <Checklist />
         <ConfirmAvailability />
+        <Checklist />
         <UpcomingSessions sessions={upcomingSessions} />
         {upcomingSessions.length > 0 && <Divider />}
         <RequestedSessions sessions={requestedSessions} />

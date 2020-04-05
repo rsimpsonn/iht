@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import styled from "styled-components";
 import { withRouter } from "react-router-dom";
-import { Loader, Tab } from "semantic-ui-react";
+import { Loader, Tab, Dropdown } from "semantic-ui-react";
 
 import userContext from "../contexts/userContext";
 import firebase from "../firebase";
@@ -31,6 +31,19 @@ const imageType = {
   "image/png": "png"
 };
 
+const rejectOptions = [
+  {
+    key: 1,
+    value: 1,
+    text: "Inadequate tutoring"
+  },
+  {
+    key: 0,
+    value: 0,
+    text: "Other circumstances"
+  }
+];
+
 class Session extends Component {
   constructor(props) {
     super(props);
@@ -52,6 +65,8 @@ class Session extends Component {
     this.setStreamToVideo = this.setStreamToVideo.bind(this);
     this.releaseStreamFromVideo = this.releaseStreamFromVideo.bind(this);
     this.downloadVideo = this.downloadVideo.bind(this);
+    this.rejectTutor = this.rejectTutor.bind(this);
+    this.verifyTutor = this.verifyTutor.bind(this);
   }
   static contextType = userContext;
 
@@ -206,6 +221,60 @@ class Session extends Component {
           addedAt: new Date()
         });
     });
+  }
+
+  verifyTutor() {
+    firebase.db
+      .collection("sessions")
+      .doc(`interview${this.state.session.tutor}`)
+      .set(
+        {
+          completed: true,
+          verified: true
+        },
+        {
+          merge: true
+        }
+      );
+
+    firebase.db
+      .collection("tutors")
+      .doc(this.state.session.tutor)
+      .set(
+        {
+          verifiedInterview: true
+        },
+        {
+          merge: true
+        }
+      );
+  }
+
+  rejectTutor() {
+    firebase.db
+      .collection("sessions")
+      .doc(`interview${this.state.session.tutor}`)
+      .set(
+        {
+          completed: true,
+          verified: false
+        },
+        {
+          merge: true
+        }
+      );
+
+    firebase.db
+      .collection("tutors")
+      .doc(this.state.session.tutor)
+      .set(
+        {
+          interviewDeclined: this.state.reason
+        },
+        {
+          merge: true
+        }
+      );
   }
 
   participantConnected(participant, previewContainer) {
@@ -456,6 +525,21 @@ class Session extends Component {
         />
         <p>Streaming test</p>
         <video ref="testMedia" autoPlay />
+        {this.state.session.interview && !this.context.isTutor && (
+          <div>
+            <SmallButton onClick={this.verifyTutor}>
+              <ButtonText>Verify Tutor</ButtonText>
+            </SmallButton>
+            <Dropdown
+              options={rejectOptions}
+              placeholder="Reason"
+              onChange={(e, data) => this.setState({ reason: data.value })}
+            />
+            <SmallButton onClick={this.rejectTutor}>
+              <ButtonText>Reject Tutor</ButtonText>
+            </SmallButton>
+          </div>
+        )}
         <SmallButton
           style={{ position: "absolute", bottom: 10, left: 10 }}
           onClick={this.leaveRoom}
