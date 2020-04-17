@@ -15,6 +15,7 @@ import {
 
 import getEduLevel, { getAllEducationLevels } from "../educationLevels";
 import firebase from "../firebase";
+import axios from "axios";
 
 import userDetailsContext from "../contexts/userDetailsContext";
 
@@ -40,7 +41,9 @@ class ClientSettings extends Component {
   }
 
   async getEduLevel() {
-    const eduLevel = await getEduLevel(this.context.userDetails.educationID);
+    const eduLevel = await getEduLevel(
+      this.context.userDetails.educationID.toString()
+    );
 
     this.setState({
       eduLevel
@@ -195,11 +198,11 @@ class ClientSettings extends Component {
               </SmallButton>
             )}
           </Card>
-          <Card>
-            <Header margin>Credit Card Information</Header>
-            <CreditCard />
-          </Card>
         </Main>
+        <Card>
+          <Header margin>Credit Card Information</Header>
+          <CreditCard />
+        </Card>
       </Row>
     );
   }

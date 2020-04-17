@@ -12,7 +12,6 @@ const config = {
 };
 
 let app = firebase.initializeApp(config);
-firebase.functions().useFunctionsEmulator("http://localhost:3000");
 firebase.analytics();
 
 const fb = {

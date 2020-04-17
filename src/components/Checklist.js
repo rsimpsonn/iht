@@ -425,11 +425,16 @@ function Checklist(props) {
           Set up routing account so that you can receive payment.
         </Accordion.Title>
         <Accordion.Content active={bankOpen}>
-          <p>
-            A dog is a type of domesticated animal. Known for its loyalty and
-            faithfulness, it can be found as a welcome guest in many households
-            across the world.
-          </p>
+          <Tiny>
+            We use Stripe to process credit card payments. Create a Stripe
+            account to accept payment.
+          </Tiny>
+          <Divider />
+          <a href="https://connect.stripe.com/oauth/authorize?response_type=code&client_id=ca_GyKQVJCzd3Lk1y2fwZAB0GnaiTR7mtZc&scope=read_write">
+            <SmallButton>
+              <ButtonText>Connect with Stripe</ButtonText>
+            </SmallButton>
+          </a>
         </Accordion.Content>
       </Accordion>
     </Box>

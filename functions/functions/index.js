@@ -3,13 +3,17 @@ const functions = require("firebase-functions");
 const emailFormatters = require("./emailFormatter");
 
 const admin = require("firebase-admin");
+const express = require("express");
 admin.initializeApp();
 
 const db = admin.firestore();
 
 const stripe = require("stripe")(functions.config().stripe.token);
 const nodemailer = require("nodemailer");
+const app = express();
+
 const cors = require("cors")({ origin: true });
+app.use(cors);
 
 let transporter = nodemailer.createTransport({
   service: "gmail",
@@ -19,28 +23,42 @@ let transporter = nodemailer.createTransport({
   }
 });
 
-/*exports.getStripeCustomer = functions.http.onCall(async (data, context) => {
-  const uid = context.auth.uid;
-
+app.get("/getCustomer/:id?", async (req, res) => {
+  const uid = req.query.id;
   const stripeCustomerDoc = await db.doc("stripe_customers/" + uid).get();
 
-  const stripeCustomer = stripeCustomer.data();
+  const stripeCustomer = stripeCustomerDoc.data();
 
-  const { err, customer } = await stripe.customers.retrieve(
-    stripeCustomer.customer_id
+  stripe.customers.retrieve(stripeCustomer.customer_id, (err, c) => {
+    if (err) {
+      res.status(401).send(err);
+    } else {
+      res.status(200).send(c);
+    }
+  });
+});
+
+app.get("/getPaymentMethods/:id?", async (req, res) => {
+  const uid = req.query.id;
+  const stripeCustomerDoc = await db.doc("stripe_customers/" + uid).get();
+
+  const stripeCustomer = stripeCustomerDoc.data();
+
+  stripe.paymentMethods.list(
+    { customer: stripeCustomer.customer_id, type: "card" },
+    (err, p) => {
+      if (err) {
+        res.status(401).send(err);
+      } else {
+        res.status(200).send(p);
+      }
+    }
   );
+});
 
-  if (err) {
-    return {
-      error: "Could not find Stripe customer"
-    };
-  }
-
-  return {
-    error: null,
-    customer
-  };
-});*/
+app.get("/rateTutor/", async (req, res) => {
+  console.log(req.query.r, req.query.id);
+});
 
 exports.clientSupport = functions.firestore
   .document("support/client/tickets/{ticket}")
@@ -221,6 +239,8 @@ exports.emailNotifications = functions.firestore
         html
       };
 
+      mailOptions.amp = emailFormatters["ampRating"](payload);
+
       const info = await transporter.sendMail(mailOptions);
 
       console.log("Message sent: %s", info.messageId);
@@ -301,6 +321,25 @@ exports.completeSessions = functions.pubsub
     });
   });
 
+exports.makeEmailFast = functions.firestore
+  .document("sessions/{id}")
+  .onCreate(async (snap, context) => {
+    const sessionData = snap.data();
+    const now = new Date();
+    const start = sessionData.start.toDate();
+
+    db.collection("alerts").add({
+      mail: true,
+      tutor: sessionData.tutor,
+      to: sessionData.client,
+      session: snap.id,
+      chargeAmount: "25.00",
+      formatter: "completedSessionClient",
+      message: `Your tutoring session on ${start.getMonth()}/${start.getDate()}`,
+      time: now
+    });
+  });
+
 exports.fulfillCharge = functions.firestore
   .document("stripe_customers/{userId}/charges/{id}")
   .onCreate(async (snap, context) => {
@@ -337,12 +376,15 @@ exports.fulfillCharge = functions.firestore
     }
   });
 
-exports.createStripeCustomer = functions.auth.user().onCreate(async user => {
-  const customer = await stripe.customers.create({ email: user.email });
-  return db
-    .doc("stripe_customers/" + user.uid)
-    .set({ customer_id: customer.id });
-});
+exports.createStripeCustomer = functions.firestore
+  .document("clients/{clientId}")
+  .onCreate(async snap => {
+    const uid = context.params.clientId;
+    const userData = await admin.auth().getUser(uid);
+
+    const customer = await stripe.customers.create({ email: userData.email });
+    return db.doc("stripe_customers/" + uid).set({ customer_id: customer.id });
+  });
 
 exports.newRequest = functions.firestore
   .document("sessions/{session}")
@@ -562,3 +604,5 @@ exports.updateRequest = functions.firestore
       }
     }
   });
+
+exports.app = functions.https.onRequest(app);

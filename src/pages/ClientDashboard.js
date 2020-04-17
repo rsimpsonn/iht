@@ -12,6 +12,7 @@ import UpcomingSessions from "../components/UpcomingSessions";
 import ScheduleSessions from "../components/ScheduleSessions";
 import PastSessions from "../components/PastSessions";
 import RequestedSessions from "../components/RequestedSessions";
+import CheckCreditCard from "../components/CheckCreditCard";
 //import PastSessions from "../components/PastSessions";
 
 class ClientDashboard extends Component {
@@ -84,6 +85,7 @@ class ClientDashboard extends Component {
 
     return (
       <div>
+        <CheckCreditCard />
         <UpcomingSessions sessions={upcomingSessions} />
         {upcomingSessions.length > 0 && <Divider />}
         <ScheduleSessions client={this.state.client} />

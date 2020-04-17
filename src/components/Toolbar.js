@@ -8,7 +8,7 @@ import { Popup } from "semantic-ui-react";
 import getTutor from "../tutors.js";
 import firebase from "../firebase";
 
-import { withRouter } from "react-router-dom";
+import { withRouter, useLocation } from "react-router-dom";
 import Alerts from "./Alerts";
 import User from "./User";
 import EmailNotVerified from "./EmailNotVerified";
@@ -22,16 +22,21 @@ import {
 import fullLogo from "../images/ivybase.png";
 
 function Toolbar(props) {
+  const location = useLocation().pathname;
   return (
     <userContext.Consumer>
       {context => (
         <div>
           <Menu>
-            <Logo
-              onClick={() => props.history.push("/")}
-              src={fullLogo}
-              style={{ width: "10%", height: "auto" }}
-            />
+            <div style={{ width: 140, marginTop: 10 }}>
+              {location !== "/" && (
+                <Logo
+                  onClick={() => props.history.push("/")}
+                  src={fullLogo}
+                  style={{ width: "100%", height: "auto" }}
+                />
+              )}
+            </div>
             {context.user == null && (
               <Bar>
                 <ListItem
@@ -70,7 +75,6 @@ function Toolbar(props) {
                   <AiOutlineHome style={{ margin: 5 }} size={25} />
                   <ListItem bold>Dashboard</ListItem>
                 </Icon>
-                <Alerts userContext={context} />
                 <Icon>
                   <Popup
                     trigger={
