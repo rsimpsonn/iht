@@ -25,9 +25,9 @@ class Alerts extends Component {
       .onSnapshot(querySnapshot =>
         this.setState({
           alerts: querySnapshot.docs.map(d => {
-            if (d.banner) {
+            if (d.data().banner) {
               const now = new Date();
-              const until = d.until.toDate();
+              const until = d.data().until.toDate();
 
               if (until.getTime() > now.getTime()) {
                 this.context.setNewAlert({

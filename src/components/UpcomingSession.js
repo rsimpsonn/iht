@@ -142,14 +142,16 @@ class UpcomingSession extends Component {
     if (fee <= 86400000) {
       docRef.set(
         {
-          status: "Cancelled fee"
+          status: "Cancelled fee",
+          cancelledBy: this.props.userContext.uid
         },
         { merge: true }
       );
     } else if (fee > 86400000) {
       docRef.set(
         {
-          status: "Cancelled no fee"
+          status: "Cancelled no fee",
+          cancelledBy: this.props.userContext.uid
         },
         { merge: true }
       );

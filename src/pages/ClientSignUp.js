@@ -18,7 +18,9 @@ function ClientSignUp(props) {
   });
 
   function handleChange(e) {
+    console.log(state);
     setState({
+      ...state,
       [e.target.name]: e.target.value
     });
   }
@@ -26,6 +28,7 @@ function ClientSignUp(props) {
   const isPortrait = useMediaQuery({ query: "(orientation: portrait)" });
 
   async function handleSubmit(e) {
+    console.log(state);
     e.preventDefault();
 
     if (
@@ -205,7 +208,9 @@ function ClientSignUp(props) {
                 name="primary"
                 value="student"
                 checked={state.primary === "student"}
-                onChange={(e, { value }) => setState({ primary: value })}
+                onChange={(e, { value }) =>
+                  setState({ ...state, primary: value })
+                }
               />
               <br />
               <br />
@@ -213,7 +218,7 @@ function ClientSignUp(props) {
                 label="Receive email notifications"
                 checked={state.studentReceivesNotifications}
                 onChange={(e, { value }) =>
-                  setState({ studentReceivesNotifications: value })
+                  setState({ ...state, studentReceivesNotifications: value })
                 }
               />
             </div>
@@ -225,7 +230,7 @@ function ClientSignUp(props) {
             <Dropdown
               placeholder="Grade"
               options={gradeOptions}
-              onChange={(e, data) => setState({ grade: data.value })}
+              onChange={(e, data) => setState({ ...state, grade: data.value })}
             />
           </GrayLine>
           <Divider />
@@ -268,7 +273,9 @@ function ClientSignUp(props) {
                 name="primary"
                 value="parent"
                 checked={state.primary === "parent"}
-                onChange={(e, { value }) => setState({ primary: value })}
+                onChange={(e, { value }) =>
+                  setState({ ...state, primary: value })
+                }
               />
               <br />
               <br />
@@ -278,7 +285,7 @@ function ClientSignUp(props) {
             label="Receive email notifications"
             checked={state.parentReceivesNotifications}
             onChange={(e, { value }) =>
-              setState({ parentReceivesNotifications: value })
+              setState({ ...state, parentReceivesNotifications: value })
             }
           />
           <Divider />
@@ -315,7 +322,9 @@ function ClientSignUp(props) {
             <Dropdown
               placeholder="Select one"
               options={scheduleOptions}
-              onChange={(e, data) => setState({ selectedSchedule: data.value })}
+              onChange={(e, data) =>
+                setState({ ...state, selectedSchedule: data.value })
+              }
             />
           </GrayLine>
           <Tiny>
@@ -329,7 +338,9 @@ function ClientSignUp(props) {
             selection
             scrolling
             options={subjectOptions}
-            onChange={(e, { value }) => setState({ selectedSubjects: value })}
+            onChange={(e, { value }) =>
+              setState({ ...state, selectedSubjects: value })
+            }
           />
           <SmallButton type="submit" style={{ marginTop: 30 }}>
             <ButtonText>Sign Up</ButtonText>

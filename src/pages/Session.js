@@ -7,6 +7,8 @@ import userContext from "../contexts/userContext";
 import firebase from "../firebase";
 import { generateToken } from "../generateToken";
 
+import Whiteboard from "../components/Whiteboard";
+
 import axios from "axios";
 
 import MediaCapturer from "react-multimedia-capture";
@@ -495,36 +497,39 @@ class Session extends Component {
     const paused = this.state.paused;
     const recording = this.state.recording;
 
+    /*
+    <MediaCapturer
+      constraints={{ audio: true, video: true }}
+      timeSlice={10}
+      onRequestPermission={this.handleRequest}
+      onGranted={this.handleGranted}
+      onDenied={this.handleDenied}
+      onStart={this.handleStart}
+      onStop={this.handleStop}
+      onPause={this.handlePause}
+      onResume={this.handleResume}
+      onError={this.handleError}
+      onStreamClosed={this.handleStreamClose}
+      render={({ request, start, stop, pause, resume }) => (
+        <div>
+          <p>Granted: {granted.toString()}</p>
+          <p>Recording: {recording.toString()}</p>
+          <p>Paused: {paused.toString()}</p>
+
+          {!granted && <button onClick={request}>Get Permission</button>}
+          <button onClick={start}>Start</button>
+          <button onClick={stop}>Stop</button>
+          <button onClick={pause}>Pause</button>
+          <button onClick={resume}>Resume</button>
+        </div>
+      )}
+    />
+    <p>Streaming test</p>
+    <video ref="testMedia" autoPlay />
+    */
+
     return (
       <div>
-        <MediaCapturer
-          constraints={{ audio: true, video: true }}
-          timeSlice={10}
-          onRequestPermission={this.handleRequest}
-          onGranted={this.handleGranted}
-          onDenied={this.handleDenied}
-          onStart={this.handleStart}
-          onStop={this.handleStop}
-          onPause={this.handlePause}
-          onResume={this.handleResume}
-          onError={this.handleError}
-          onStreamClosed={this.handleStreamClose}
-          render={({ request, start, stop, pause, resume }) => (
-            <div>
-              <p>Granted: {granted.toString()}</p>
-              <p>Recording: {recording.toString()}</p>
-              <p>Paused: {paused.toString()}</p>
-
-              {!granted && <button onClick={request}>Get Permission</button>}
-              <button onClick={start}>Start</button>
-              <button onClick={stop}>Stop</button>
-              <button onClick={pause}>Pause</button>
-              <button onClick={resume}>Resume</button>
-            </div>
-          )}
-        />
-        <p>Streaming test</p>
-        <video ref="testMedia" autoPlay />
         {this.state.session.interview && !this.context.isTutor && (
           <div>
             <SmallButton onClick={this.verifyTutor}>
@@ -572,6 +577,7 @@ class Session extends Component {
               </Col>
             </Bar>
           </RightColumn>
+          <Whiteboard session={this.state.sessionId} />
         </Row>
       </div>
     );
