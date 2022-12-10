@@ -15,7 +15,7 @@
     "firebase": "^7.11.0",
     "global": "^4.4.0",
     "googleapis": "39",
-    "qs": "^6.9.2",
+    "qs": "^6.9.7",
     "react": "^16.13.0",
     "react-available-times": "^1.4.0",
     "react-big-calendar": "^0.24.1",
